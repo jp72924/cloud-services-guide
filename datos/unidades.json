@@ -1,0 +1,441 @@
+{
+  "version": 1,
+  "actualizado": "2026-09-07",
+  "descripcion": "Catálogo de unidades con que se miden y cobran los servicios de nube. Capa estable: cambia muy poco con el tiempo.",
+  "tipos_de_limite": [
+    {
+      "id": "cuota-agrupada",
+      "nombre": "Bolsa (cuota agrupada)",
+      "explicacion": "Un total que puedes gastar como quieras durante el período. Si el mes te da 180 000 vCPU-segundos, puedes gastarlos en una petición larga o en un millón de peticiones cortas.",
+      "por_que_importa": "Una petición pesada aislada no rompe nada mientras el total del mes alcance."
+    },
+    {
+      "id": "tope-por-peticion",
+      "nombre": "Tope por petición",
+      "explicacion": "Un máximo que ninguna petición individual puede superar, sin importar cuánto te sobre del total.",
+      "por_que_importa": "Es la distinción más importante de todo este catálogo. Una operación cara (verificar una contraseña, generar un PDF) falla siempre, aunque el mes entero esté sin usar."
+    },
+    {
+      "id": "tope-diario",
+      "nombre": "Tope diario",
+      "explicacion": "Una bolsa que se repone cada día, normalmente a medianoche UTC.",
+      "por_que_importa": "Un pico de tráfico en un día puede dejarte fuera hasta el día siguiente, aunque el mes vaya holgado."
+    },
+    {
+      "id": "tope-concurrente",
+      "nombre": "Tope simultáneo",
+      "explicacion": "Cuántas cosas pueden estar ocurriendo a la vez, sin límite sobre el total acumulado.",
+      "por_que_importa": "Limita el pico, no el volumen. Se nota en horas punta."
+    }
+  ],
+  "unidades": [
+    {
+      "id": "vcpu-segundo",
+      "nombre": "vCPU-segundo",
+      "magnitud": "tiempo de cómputo",
+      "que_mide": "Un núcleo virtual de procesador ocupado durante un segundo.",
+      "en_palabras_simples": "Es 'un segundo de un procesador'. Si tu programa usa 2 núcleos durante 3 segundos, gastaste 6 vCPU-segundos.",
+      "formula": "núcleos asignados × segundos de ejecución",
+      "equivalencia_util": "180 000 vCPU-segundos al mes ≈ un núcleo trabajando 50 horas, o 60 000 peticiones de 3 segundos.",
+      "se_usa_en": ["contenedores-gestionados", "funciones-serverless", "computo-edge"]
+    },
+    {
+      "id": "vcpu-hora",
+      "nombre": "vCPU-hora",
+      "magnitud": "tiempo de cómputo",
+      "que_mide": "Un núcleo virtual reservado durante una hora, se use o no.",
+      "en_palabras_simples": "Como alquilar un motor por horas: pagas por tenerlo disponible, aunque esté al ralentí.",
+      "formula": "núcleos asignados × horas encendido",
+      "equivalencia_util": "Una máquina de 2 núcleos encendida todo el mes = ~1 460 vCPU-horas.",
+      "se_usa_en": ["maquina-virtual", "kubernetes-gestionado", "base-relacional"]
+    },
+    {
+      "id": "ocpu-hora",
+      "nombre": "OCPU-hora",
+      "magnitud": "tiempo de cómputo",
+      "que_mide": "Unidad propia de Oracle. Una OCPU equivale aproximadamente a un núcleo físico completo, no a un hilo.",
+      "en_palabras_simples": "Es una vCPU-hora de Oracle, pero cada OCPU rinde más o menos como dos vCPU de otros proveedores.",
+      "advertencia": "No compares OCPU contra vCPU una a una: subestimarías a Oracle por un factor cercano a dos.",
+      "equivalencia_util": "1 500 OCPU-horas al mes = 2 OCPU encendidas de forma continua (un mes tiene ~730 horas).",
+      "se_usa_en": ["maquina-virtual", "contenedores-gestionados"]
+    },
+    {
+      "id": "gb-segundo",
+      "nombre": "GB-segundo",
+      "magnitud": "memoria × tiempo",
+      "que_mide": "Un gigabyte de memoria reservado durante un segundo.",
+      "en_palabras_simples": "Combina cuánta memoria pediste con cuánto tiempo la tuviste. Media memoria durante el doble de tiempo cuesta lo mismo.",
+      "formula": "GB de memoria asignada × segundos de ejecución",
+      "equivalencia_util": "400 000 GB-segundos al mes ≈ una función de 512 MB corriendo nueve días seguidos.",
+      "se_usa_en": ["funciones-serverless", "contenedores-gestionados"]
+    },
+    {
+      "id": "gib-segundo",
+      "nombre": "GiB-segundo",
+      "magnitud": "memoria × tiempo",
+      "que_mide": "Igual que el GB-segundo pero con gibibytes (1 024 MiB en vez de 1 000 MB).",
+      "en_palabras_simples": "La misma idea, con una regla algo más grande: un GiB es un 7,4 % mayor que un GB.",
+      "advertencia": "Proveedores distintos usan GB o GiB para lo mismo. Comparar sin convertir introduce un error del 7 %.",
+      "se_usa_en": ["contenedores-gestionados", "funciones-serverless"]
+    },
+    {
+      "id": "ms-cpu-peticion",
+      "nombre": "Milisegundos de CPU por petición",
+      "magnitud": "tiempo de cómputo",
+      "que_mide": "Cuánto puede ocupar el procesador una sola petición, de principio a fin.",
+      "en_palabras_simples": "Un cronómetro por visita. Si tu código tarda más de lo permitido en pensar, esa visita se cae.",
+      "tipo_de_limite_habitual": "tope-por-peticion",
+      "advertencia": "No cuenta el tiempo de espera (consultas a la base, llamadas a otras APIs): solo el cálculo real. Por eso una consulta lenta no te penaliza, pero cifrar una contraseña sí.",
+      "equivalencia_util": "10 ms alcanzan de sobra para armar una página; no alcanzan para verificar una contraseña con PBKDF2 de 100 000 iteraciones, que cuesta unos 33 ms.",
+      "se_usa_en": ["computo-edge"]
+    },
+    {
+      "id": "cpu-minutos-dia",
+      "nombre": "Minutos de CPU al día",
+      "magnitud": "tiempo de cómputo",
+      "que_mide": "Bolsa diaria de procesamiento que se repone cada 24 horas.",
+      "en_palabras_simples": "Un cupo diario de trabajo. Al agotarlo, el sitio deja de responder hasta el día siguiente.",
+      "tipo_de_limite_habitual": "tope-diario",
+      "equivalencia_util": "60 minutos al día = 3 600 segundos de cálculo, unas 1 200 peticiones de 3 segundos.",
+      "se_usa_en": ["plataforma-aplicaciones"]
+    },
+    {
+      "id": "gpu-hora",
+      "nombre": "GPU-hora",
+      "magnitud": "tiempo de cómputo especializado",
+      "que_mide": "Una tarjeta aceleradora reservada durante una hora.",
+      "en_palabras_simples": "El alquiler de una tarjeta gráfica para entrenar o ejecutar modelos de inteligencia artificial.",
+      "advertencia": "Es la unidad más cara del catálogo, entre 10 y 100 veces una vCPU-hora. El modelo de tarjeta importa tanto como la cantidad de horas.",
+      "se_usa_en": ["gpu-aceleradores"]
+    },
+    {
+      "id": "peticion",
+      "nombre": "Petición (request)",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Cada vez que alguien o algo le pide algo a tu servicio.",
+      "en_palabras_simples": "Una visita, una llamada, un clic que llega al servidor. Cargar una página suele generar varias.",
+      "advertencia": "Una sola visita de una persona puede contar como 10 o 20 peticiones si la página pide imágenes, tipografías y datos por separado.",
+      "se_usa_en": ["computo-edge", "funciones-serverless", "contenedores-gestionados", "cdn", "api-gateway"]
+    },
+    {
+      "id": "invocacion",
+      "nombre": "Invocación",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Cada ejecución de una función, venga de donde venga.",
+      "en_palabras_simples": "Como una petición, pero contando arranques del código en vez de visitas: incluye lo que dispara un temporizador o una cola.",
+      "se_usa_en": ["funciones-serverless", "tareas-programadas"]
+    },
+    {
+      "id": "operacion-clase-a",
+      "nombre": "Operación Clase A (escritura)",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Operaciones que modifican o listan: subir, copiar, listar contenidos.",
+      "en_palabras_simples": "Las operaciones 'caras' del almacenamiento de archivos.",
+      "advertencia": "Cuestan del orden de diez veces más que las de lectura. Listar una carpeta cuenta como escritura aunque no escribas nada.",
+      "se_usa_en": ["almacenamiento-objetos"]
+    },
+    {
+      "id": "operacion-clase-b",
+      "nombre": "Operación Clase B (lectura)",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Operaciones que solo leen: descargar un archivo, consultar si existe.",
+      "en_palabras_simples": "Las operaciones 'baratas' del almacenamiento de archivos.",
+      "se_usa_en": ["almacenamiento-objetos"]
+    },
+    {
+      "id": "ru-segundo",
+      "nombre": "RU/s (unidades de petición por segundo)",
+      "magnitud": "capacidad reservada de base de datos",
+      "que_mide": "Unidad compuesta de Azure Cosmos DB que mezcla lectura, escritura, CPU y memoria en un solo número.",
+      "en_palabras_simples": "Un presupuesto de esfuerzo por segundo para la base de datos. Leer un documento pequeño cuesta ~1 RU; escribirlo cuesta ~5.",
+      "advertencia": "Se reserva por adelantado, no se consume por uso: pagas la capacidad aunque nadie la use.",
+      "se_usa_en": ["base-documental"]
+    },
+    {
+      "id": "fila-leida",
+      "nombre": "Fila leída",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Cada fila que la base de datos tuvo que examinar para responder, no las que devolvió.",
+      "en_palabras_simples": "Si buscas una aguja en un pajar sin índice, pagas por todo el pajar aunque te lleves una aguja.",
+      "advertencia": "Una consulta mal indexada puede leer millones de filas y devolver una. Es la forma más común de agotar una cuota sin darse cuenta.",
+      "se_usa_en": ["base-edge"]
+    },
+    {
+      "id": "fila-escrita",
+      "nombre": "Fila escrita",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Cada fila insertada, modificada o borrada.",
+      "en_palabras_simples": "Cada anotación nueva o corregida en la base de datos.",
+      "advertencia": "Actualizar una fila con índices cuenta también las actualizaciones de esos índices.",
+      "se_usa_en": ["base-edge"]
+    },
+    {
+      "id": "consulta",
+      "nombre": "Consulta",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Cada instrucción enviada a la base de datos.",
+      "en_palabras_simples": "Cada pregunta que tu programa le hace a la base.",
+      "advertencia": "Algunos planes limitan cuántas consultas puedes hacer dentro de una sola petición, no solo cuántas al mes.",
+      "se_usa_en": ["base-relacional", "base-edge", "busqueda-gestionada"]
+    },
+    {
+      "id": "lcu",
+      "nombre": "LCU (unidad de capacidad de balanceador)",
+      "magnitud": "capacidad de red",
+      "que_mide": "Unidad compuesta de AWS que mezcla conexiones nuevas, conexiones activas, ancho de banda y reglas evaluadas.",
+      "en_palabras_simples": "Un número inventado que resume cuánto trabajo le diste al repartidor de tráfico.",
+      "advertencia": "Se cobra por la dimensión que más consumas, no por la suma. Difícil de estimar por adelantado.",
+      "se_usa_en": ["balanceador-carga"]
+    },
+    {
+      "id": "gb-mes",
+      "nombre": "GB-mes",
+      "magnitud": "almacenamiento × tiempo",
+      "que_mide": "Un gigabyte guardado durante un mes completo.",
+      "en_palabras_simples": "No es 'cuánto guardas' sino 'cuánto guardas por cuánto tiempo'. Diez GB durante medio mes = 5 GB-mes.",
+      "formula": "GB almacenados × fracción del mes que estuvieron ahí",
+      "se_usa_en": ["almacenamiento-objetos", "almacenamiento-bloques", "almacenamiento-archivos", "almacenamiento-frio", "copias-seguridad"]
+    },
+    {
+      "id": "gib",
+      "nombre": "GiB (gibibyte)",
+      "magnitud": "almacenamiento",
+      "que_mide": "1 073 741 824 bytes: 1 024 mebibytes.",
+      "en_palabras_simples": "Un 'gigabyte de informático'. Es un 7,4 % más grande que el gigabyte comercial (1 000 millones de bytes).",
+      "advertencia": "Cuando un proveedor dice GiB y otro dice GB para el mismo producto, la comparación directa se equivoca en un 7 %. Verifica siempre cuál usa cada uno.",
+      "se_usa_en": ["almacenamiento-bloques", "contenedores-gestionados"]
+    },
+    {
+      "id": "iops",
+      "nombre": "IOPS (operaciones de entrada/salida por segundo)",
+      "magnitud": "rendimiento de disco",
+      "que_mide": "Cuántas lecturas o escrituras individuales aguanta el disco por segundo.",
+      "en_palabras_simples": "Cuántas veces por segundo puede el disco atender un pedido. Importa cuando hay muchos accesos pequeños, como en una base de datos.",
+      "advertencia": "Muchos discos baratos dan IOPS 'por ráfagas': rinden bien un rato y luego se estrangulan.",
+      "se_usa_en": ["almacenamiento-bloques", "base-relacional"]
+    },
+    {
+      "id": "mb-por-segundo",
+      "nombre": "MB/s (rendimiento sostenido)",
+      "magnitud": "rendimiento de disco o red",
+      "que_mide": "Cuántos megabytes por segundo puede mover de forma continua.",
+      "en_palabras_simples": "El ancho de la manguera. Importa para archivos grandes; los IOPS importan para archivos pequeños.",
+      "se_usa_en": ["almacenamiento-bloques", "almacenamiento-archivos"]
+    },
+    {
+      "id": "dias-retencion-minima",
+      "nombre": "Días de retención mínima",
+      "magnitud": "compromiso de tiempo",
+      "que_mide": "El tiempo mínimo que te cobrarán por un archivo, aunque lo borres antes.",
+      "en_palabras_simples": "Una permanencia mínima. Si guardas algo en almacenamiento de archivo con 90 días de mínimo y lo borras al día siguiente, pagas los 90 días igual.",
+      "advertencia": "Es la trampa clásica del almacenamiento frío: parece diez veces más barato hasta que necesitas rotar los datos.",
+      "se_usa_en": ["almacenamiento-frio", "copias-seguridad"]
+    },
+    {
+      "id": "objetos-almacenados",
+      "nombre": "Número de objetos",
+      "magnitud": "cantidad",
+      "que_mide": "Cuántos archivos hay guardados, sin importar su tamaño.",
+      "en_palabras_simples": "Un millón de archivos diminutos puede costar más que un archivo enorme, porque cada uno lleva su propio registro.",
+      "se_usa_en": ["almacenamiento-objetos"]
+    },
+    {
+      "id": "gb-egreso",
+      "nombre": "GB de salida (egreso)",
+      "magnitud": "transferencia de red",
+      "que_mide": "Los datos que salen desde el proveedor hacia internet o hacia otra región.",
+      "en_palabras_simples": "Lo que cuesta que tus visitantes descarguen tus páginas, imágenes y archivos.",
+      "advertencia": "Es el coste oculto más frecuente de toda la nube, y el que más varía por región: salir desde São Paulo puede costar seis veces más que desde Virginia. Entrar (ingreso) casi siempre es gratis.",
+      "equivalencia_util": "1 GB al mes ≈ 2 000 visitas a una página de texto de 500 KB. Se agota muy rápido si sirves imágenes o vídeo.",
+      "se_usa_en": ["almacenamiento-objetos", "maquina-virtual", "cdn", "contenedores-gestionados"]
+    },
+    {
+      "id": "gb-ingreso",
+      "nombre": "GB de entrada (ingreso)",
+      "magnitud": "transferencia de red",
+      "que_mide": "Los datos que entran al proveedor desde fuera.",
+      "en_palabras_simples": "Lo que suben tus usuarios. Casi siempre es gratis, precisamente para que te resulte fácil meter datos y difícil sacarlos.",
+      "se_usa_en": ["almacenamiento-objetos", "maquina-virtual"]
+    },
+    {
+      "id": "peticiones-por-segundo",
+      "nombre": "Peticiones por segundo",
+      "magnitud": "capacidad instantánea",
+      "que_mide": "Cuánto tráfico simultáneo aguanta antes de rechazar o encolar.",
+      "en_palabras_simples": "El pico que soporta, no el total que procesa.",
+      "tipo_de_limite_habitual": "tope-concurrente",
+      "se_usa_en": ["api-gateway", "balanceador-carga", "waf-ddos"]
+    },
+    {
+      "id": "consultas-dns-mes",
+      "nombre": "Consultas DNS al mes",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Cuántas veces se preguntó por la dirección de tu dominio.",
+      "en_palabras_simples": "Cada vez que un navegador nuevo busca dónde vive tu sitio.",
+      "se_usa_en": ["dns-gestionado"]
+    },
+    {
+      "id": "correo-enviado",
+      "nombre": "Correo enviado",
+      "magnitud": "cantidad de mensajes",
+      "que_mide": "Cada mensaje entregado al servidor de correo del destinatario.",
+      "en_palabras_simples": "Cada correo que tu sistema manda: confirmaciones, recuperación de contraseña, avisos.",
+      "advertencia": "Un envío a 100 destinatarios cuenta como 100, no como 1.",
+      "se_usa_en": ["correo-transaccional"]
+    },
+    {
+      "id": "sms-por-destino",
+      "nombre": "SMS (con precio por país)",
+      "magnitud": "cantidad de mensajes",
+      "que_mide": "Cada mensaje de texto, tarifado según el país y la operadora de destino.",
+      "en_palabras_simples": "A diferencia del correo, aquí el precio cambia radicalmente según a dónde envíes: puede haber diferencias de veinte veces entre países.",
+      "advertencia": "Nunca estimes el coste de SMS con un precio único: hay que calcularlo por país de destino.",
+      "se_usa_en": ["sms-mensajeria"]
+    },
+    {
+      "id": "minuto-voz",
+      "nombre": "Minuto de voz",
+      "magnitud": "tiempo de comunicación",
+      "que_mide": "Cada minuto de llamada, normalmente diferenciando entrante y saliente.",
+      "en_palabras_simples": "Como la tarifa telefónica de siempre, con precio distinto según el destino.",
+      "se_usa_en": ["voz-telefonia"]
+    },
+    {
+      "id": "minuto-participante",
+      "nombre": "Minuto-participante",
+      "magnitud": "tiempo × personas",
+      "que_mide": "Un asistente conectado durante un minuto.",
+      "en_palabras_simples": "Una reunión de 5 personas durante 10 minutos son 50 minutos-participante, no 10.",
+      "advertencia": "El coste crece con el cuadrado del grupo en videollamadas malladas: es la unidad que más sorprende en la factura.",
+      "se_usa_en": ["video-tiempo-real"]
+    },
+    {
+      "id": "notificacion-push",
+      "nombre": "Notificación push",
+      "magnitud": "cantidad de mensajes",
+      "que_mide": "Cada aviso enviado a un dispositivo móvil o navegador.",
+      "en_palabras_simples": "Cada vez que haces sonar el teléfono de alguien.",
+      "se_usa_en": ["notificaciones-push"]
+    },
+    {
+      "id": "conexion-concurrente",
+      "nombre": "Conexión simultánea",
+      "magnitud": "capacidad instantánea",
+      "que_mide": "Cuántos clientes pueden estar conectados a la vez de forma permanente.",
+      "en_palabras_simples": "En un chat o un tablero en vivo, cuánta gente puede estar mirando al mismo tiempo.",
+      "tipo_de_limite_habitual": "tope-concurrente",
+      "se_usa_en": ["chat-tiempo-real", "base-relacional"]
+    },
+    {
+      "id": "mensaje-cola",
+      "nombre": "Mensaje en cola",
+      "magnitud": "cantidad de trabajo",
+      "que_mide": "Cada mensaje puesto o sacado de una cola de trabajo.",
+      "en_palabras_simples": "Cada tarea que dejas anotada para procesarla después.",
+      "advertencia": "Poner y sacar suelen contar como dos operaciones distintas.",
+      "se_usa_en": ["colas-mensajes"]
+    },
+    {
+      "id": "mau",
+      "nombre": "MAU (usuario activo mensual)",
+      "magnitud": "cantidad de personas",
+      "que_mide": "Cuántas personas distintas usaron el servicio al menos una vez en el mes.",
+      "en_palabras_simples": "No cuenta cuántas cuentas tienes, sino cuántas se usaron este mes.",
+      "advertencia": "Es la unidad de precio más peligrosa para un producto que crece: el coste sube con los usuarios aunque cada uno haga muy poco.",
+      "se_usa_en": ["autenticacion-gestionada", "analitica-web"]
+    },
+    {
+      "id": "token-entrada",
+      "nombre": "Token de entrada",
+      "magnitud": "cantidad de texto procesado",
+      "que_mide": "Los fragmentos de texto que le envías a un modelo de lenguaje.",
+      "en_palabras_simples": "Un token es un trozo de palabra. En español, unos 100 tokens equivalen a 70 u 80 palabras.",
+      "advertencia": "Los tokens de entrada suelen costar entre 3 y 5 veces menos que los de salida. Contarlos juntos distorsiona cualquier estimación.",
+      "se_usa_en": ["modelo-lenguaje"]
+    },
+    {
+      "id": "token-salida",
+      "nombre": "Token de salida",
+      "magnitud": "cantidad de texto generado",
+      "que_mide": "Los fragmentos de texto que el modelo genera como respuesta.",
+      "en_palabras_simples": "Lo que el modelo escribe. Es la parte cara.",
+      "se_usa_en": ["modelo-lenguaje"]
+    },
+    {
+      "id": "pagina-ocr",
+      "nombre": "Página procesada",
+      "magnitud": "cantidad de documentos",
+      "que_mide": "Cada página de la que se extrae texto.",
+      "en_palabras_simples": "Una foto de un recibo o una hoja de un PDF.",
+      "advertencia": "Un PDF de 20 páginas cuenta como 20, no como 1.",
+      "se_usa_en": ["ocr-documentos"]
+    },
+    {
+      "id": "caracter",
+      "nombre": "Carácter",
+      "magnitud": "cantidad de texto",
+      "que_mide": "Cada letra, número o signo procesado.",
+      "en_palabras_simples": "La unidad típica de la traducción automática y la síntesis de voz. Una página de texto son unos 2 000 caracteres.",
+      "se_usa_en": ["traduccion", "sintesis-voz"]
+    },
+    {
+      "id": "minuto-audio",
+      "nombre": "Minuto de audio",
+      "magnitud": "tiempo de medios",
+      "que_mide": "Cada minuto de grabación transcrita o analizada.",
+      "en_palabras_simples": "La duración de la grabación, no lo que se dijo en ella.",
+      "se_usa_en": ["transcripcion-voz"]
+    },
+    {
+      "id": "imagen-procesada",
+      "nombre": "Imagen procesada",
+      "magnitud": "cantidad de medios",
+      "que_mide": "Cada imagen analizada, transformada o generada.",
+      "en_palabras_simples": "Cada foto que el servicio mira o crea.",
+      "se_usa_en": ["vision-imagenes", "procesamiento-imagenes"]
+    },
+    {
+      "id": "gb-ingerido",
+      "nombre": "GB ingerido",
+      "magnitud": "volumen de datos",
+      "que_mide": "Cuántos datos de registro entraron al sistema de observabilidad.",
+      "en_palabras_simples": "El peso de todo lo que tu aplicación anota sobre sí misma.",
+      "advertencia": "Los registros crecen mucho más rápido de lo que la gente espera, y se cobran dos veces: por ingerir y por retener.",
+      "se_usa_en": ["registros-logs"]
+    },
+    {
+      "id": "serie-temporal-activa",
+      "nombre": "Serie temporal activa",
+      "magnitud": "cantidad de indicadores",
+      "que_mide": "Cada combinación única de métrica y etiquetas que recibió datos.",
+      "en_palabras_simples": "Si mides 'peticiones' con etiqueta por país y tienes 50 países, son 50 series, no una.",
+      "advertencia": "Añadir una etiqueta con muchos valores posibles (como el identificador de usuario) puede multiplicar la factura por mil. Se llama explosión de cardinalidad.",
+      "se_usa_en": ["metricas"]
+    },
+    {
+      "id": "span",
+      "nombre": "Span (traza)",
+      "magnitud": "cantidad de eventos",
+      "que_mide": "Cada paso registrado dentro del recorrido de una petición.",
+      "en_palabras_simples": "Una petición que pasa por cinco componentes genera cinco spans.",
+      "se_usa_en": ["trazas"]
+    },
+    {
+      "id": "verificacion-sintetica",
+      "nombre": "Verificación de disponibilidad",
+      "magnitud": "cantidad de comprobaciones",
+      "que_mide": "Cada vez que un robot comprueba si tu sitio responde.",
+      "en_palabras_simples": "Comprobar cada minuto son ~43 200 comprobaciones al mes; cada cinco minutos, ~8 640. El intervalo define el coste.",
+      "se_usa_en": ["monitoreo-disponibilidad"]
+    },
+    {
+      "id": "porcentaje-transaccion",
+      "nombre": "Porcentaje por transacción + fijo",
+      "magnitud": "comisión sobre dinero movido",
+      "que_mide": "Una parte proporcional del importe más una cantidad fija por operación.",
+      "en_palabras_simples": "Típicamente algo como '2,9 % + 0,30 USD'. En cobros pequeños la parte fija domina: en un cobro de 1 USD, la comisión puede ser un tercio.",
+      "advertencia": "Es la única unidad del catálogo que escala con tu facturación y no con tu consumo técnico.",
+      "se_usa_en": ["pasarela-pagos"]
+    }
+  ]
+}

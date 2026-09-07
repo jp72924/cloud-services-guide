@@ -1,0 +1,6 @@
+# Producto generado: se reconstruye con node scripts/generar.mjs
+guia.html
+
+# Sistema
+.DS_Store
+node_modules/

@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Esquema de la base de conocimiento de servicios de nube",
+  "description": "Contrato de los tres archivos de datos. La capa estable (tipos, unidades) responde qué es cada servicio y en qué se mide; la capa volátil (ofertas) responde quién lo da, cuánto y a qué precio.",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Identificador en minúsculas separado por guiones."
+    },
+    "fecha": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Fecha ISO, año-mes-día."
+    },
+    "unidad": {
+      "type": "object",
+      "required": ["id", "nombre", "magnitud", "que_mide", "en_palabras_simples"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "nombre": { "type": "string" },
+        "magnitud": { "type": "string", "description": "Qué dimensión física o comercial mide." },
+        "que_mide": { "type": "string", "description": "Definición técnica en una frase." },
+        "en_palabras_simples": { "type": "string", "description": "La misma idea sin jerga. Obligatorio: es lo que hace la guía legible para cualquiera." },
+        "formula": { "type": "string" },
+        "equivalencia_util": { "type": "string", "description": "Una referencia concreta que dé sentido a la magnitud." },
+        "advertencia": { "type": "string" },
+        "tipo_de_limite_habitual": { "type": "string" },
+        "se_usa_en": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "tipo": {
+      "type": "object",
+      "required": ["id", "familia", "nombre", "que_es", "para_que_sirve", "unidades"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "familia": { "$ref": "#/$defs/id" },
+        "nombre": { "type": "string" },
+        "alias": { "type": "array", "items": { "type": "string" }, "description": "Cómo lo llama la industria, para poder buscarlo." },
+        "que_es": { "type": "string" },
+        "para_que_sirve": { "type": "string" },
+        "unidades": { "type": "array", "items": { "$ref": "#/$defs/id" }, "description": "Unidades en que se mide y cobra este tipo." },
+        "trampas": { "type": "array", "items": { "type": "string" } },
+        "ejemplos_proveedor": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "cantidad": {
+      "type": "object",
+      "required": ["unidad", "cantidad"],
+      "properties": {
+        "unidad": { "$ref": "#/$defs/id" },
+        "cantidad": { "type": "number" },
+        "periodo": { "enum": ["dia", "mes", "ano", null] },
+        "tipo_limite": {
+          "enum": ["cuota-agrupada", "tope-por-peticion", "tope-diario", "tope-concurrente"],
+          "description": "LA DISTINCIÓN CLAVE. Una bolsa mensual y un tope por petición son cosas incomparables: el segundo hace fallar operaciones caras aunque sobre cuota."
+        },
+        "nota": { "type": "string" }
+      }
+    },
+    "oferta": {
+      "type": "object",
+      "required": ["id", "proveedor", "servicio", "tipo", "gratis", "modalidad", "precio", "confianza", "verificado", "fuentes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "proveedor": { "type": "string", "description": "Quién lo ofrece." },
+        "servicio": { "type": "string", "description": "Cómo se llama comercialmente." },
+        "tipo": { "$ref": "#/$defs/id", "description": "Referencia a tipos.json: de ahí salen el qué es y el para qué sirve." },
+        "gratis": { "type": "boolean" },
+        "modalidad": { "$ref": "#/$defs/id", "description": "Responde al '¿cuánto dura?': por tiempo o por cuota de consumo." },
+        "requiere_tarjeta": { "type": ["boolean", "null"] },
+        "caduca": { "type": ["string", "null"], "description": "Fecha o descripción del vencimiento. null = no caduca." },
+        "incluye": { "type": "array", "items": { "$ref": "#/$defs/cantidad" }, "description": "Responde al '¿qué ofrece?', en las unidades del tipo." },
+        "precio": { "type": "string" },
+        "precio_al_exceder": { "type": "string" },
+        "notas": { "type": "string" },
+        "confianza": {
+          "enum": ["oficial", "secundaria"],
+          "description": "'oficial' = verificado en la documentación del proveedor. 'secundaria' = otra fuente; tratar con cautela."
+        },
+        "verificado": { "$ref": "#/$defs/fecha" },
+        "fuentes": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "uri" }, "description": "Obligatorio. Una fila sin fuente no entra." }
+      }
+    }
+  },
+  "reglas_de_integridad": [
+    "Todo tipo.familia debe existir en tipos.json/familias",
+    "Toda unidad citada en tipos.unidades debe existir en unidades.json",
+    "Toda oferta.tipo debe existir en tipos.json",
+    "Toda oferta.incluye[].unidad debe existir en unidades.json",
+    "Toda oferta.modalidad debe existir en ofertas.json/modalidades",
+    "Todo tipo_limite debe existir en unidades.json/tipos_de_limite",
+    "Los identificadores son únicos dentro de su archivo",
+    "Toda oferta tiene fecha de verificación y al menos una fuente"
+  ]
+}
