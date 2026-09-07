@@ -104,6 +104,13 @@ Todas encontradas verificando ofertas reales, no hipotéticas.
 5. **Comprueba si caduca** y si exige tarjeta.
 6. **Mira la fecha de verificación.** Si tiene más de tres meses, vuelve a la fuente antes de decidir.
 
+### Cuidado con los ratios resumen
+
+Es tentador reducir una línea de producto a un número, tipo «dólares por GB de RAM al mes». Dos avisos:
+
+- **Un ratio no representa a la línea entera.** Dentro de una misma familia el mejor y el peor escalón pueden diferir bastante: en la línea CPX de Hetzner va de 6,75 USD por GB en el plan de entrada a 5,12 en el mayor, y en Linode el Nanode sale a 5,00 mientras el resto de la escala está en 6,00. Si citas un solo número, di **de qué plan salió**; mejor aún, da el rango.
+- **El ratio de un recurso ignora los demás.** Los peores valores por GB de RAM suelen ser planes donde pagas por CPU adicional, no por memoria: el de 2 vCPU y 2 GiB de DigitalOcean sale a 9,00 USD por GB precisamente porque el segundo núcleo se cobra ahí. No es un plan malo, es un plan orientado a otra cosa.
+
 ---
 
 ## Por qué esta guía desconfía de los agregadores

@@ -509,7 +509,7 @@
       "caduca": null,
       "incluye": [],
       "precio": "de 6,49 a 18,49 USD/mes; de 0,010 a 0,030 USD/hora",
-      "notas": "vCPU compartida Intel/AMD. Es la relación precio/RAM más baja de las cinco líneas comparadas: entre 1,16 y 1,62 USD por GB de RAM al mes, frente a los 5,00 fijos de Vultr y Linode. La tabla no publica transferencia incluida. Acepta PayPal y SEPA.",
+      "notas": "vCPU compartida Intel/AMD. Es la relación precio/RAM más baja de las cinco líneas comparadas: de 1,62 USD por GB de RAM al mes en el escalón de entrada (CX23) a 1,16 en el mayor (CX43). Las otras cuatro líneas no bajan de 5,00. La tabla no publica transferencia incluida. Acepta PayPal y SEPA.",
       "unidades_binarias": false,
       "planes": [
         { "plan": "CX23", "vcpu": 2, "procesador": "Intel/AMD", "ram_gb": 4, "almacenamiento_gb": 40, "transferencia_tb": null, "precio_hora_usd": 0.010, "precio_mes_usd": 6.49 },
@@ -532,7 +532,7 @@
       "caduca": null,
       "incluye": [],
       "precio": "de 13,49 a 81,99 USD/mes; de 0,022 a 0,131 USD/hora",
-      "notas": "vCPU compartida AMD, con más disco por plan que la línea CX pero a un precio por GB de RAM entre cuatro y cinco veces mayor. El CPX12 es plan nuevo. La tabla no publica transferencia incluida.",
+      "notas": "vCPU compartida AMD, con más disco por plan que la línea CX pero a un precio por GB de RAM cuatro veces mayor: de 6,75 USD en el escalón de entrada (CPX12) a 5,12 en el mayor (CPX42), frente al rango de 1,62 a 1,16 de la CX. El CPX12 es plan nuevo. La tabla no publica transferencia incluida.",
       "unidades_binarias": false,
       "planes": [
         { "plan": "CPX12", "vcpu": 1, "procesador": "AMD", "ram_gb": 2, "almacenamiento_gb": 40, "transferencia_tb": null, "precio_hora_usd": 0.022, "precio_mes_usd": 13.49 },
@@ -610,7 +610,7 @@
       "caduca": null,
       "incluye": [],
       "precio": "de 5,00 a 384,00 USD/mes; de 0,0075 a 0,5760 USD/hora",
-      "notas": "La única de las cinco líneas que publica el ancho de banda de red por plan (40 Gbps de entrada; de 1 a 9 Gbps de salida). Precio por GB de RAM fijo en 5,00 USD/mes en toda la escala, igual que Vultr. Es también la que escala más arriba, hasta 64 GB de RAM.",
+      "notas": "La única de las cinco líneas que publica el ancho de banda de red por plan (40 Gbps de entrada; de 1 a 9 Gbps de salida). El Nanode sale a 5,00 USD por GB de RAM al mes y todos los demás escalones a 6,00: conviene no leer el precio de entrada como representativo de la línea. Es también la que escala más arriba, hasta 64 GB de RAM.",
       "unidades_binarias": false,
       "planes": [
         { "plan": "Nanode 1 GB", "vcpu": 1, "ram_gb": 1, "almacenamiento_gb": 25, "transferencia_tb": 1, "red_gbps": "40/1", "precio_hora_usd": 0.0075, "precio_mes_usd": 5.00 },
