@@ -30,7 +30,7 @@ Si se mezclaran en un solo documento, todo caducaría a la velocidad de lo más 
 GUIA.md              La guía legible: cómo leer una oferta sin que te engañen
 datos/unidades.json  46 unidades, con explicación en lenguaje llano
 datos/tipos.json     71 tipos de servicio en 10 familias
-datos/ofertas.json   37 ofertas verificadas, con fecha y fuente
+datos/ofertas.json   33 ofertas verificadas, con fecha y fuente
                      (7 de ellas con la tabla de planes completa: 48 escalones)
 esquema/esquema.json El contrato de los datos y las reglas de integridad
 scripts/validar.mjs  Valida y avisa de lo que está viejo
@@ -99,6 +99,6 @@ OVHcloud no aparece en la tabla porque **no publica tarifa horaria**: su línea 
 
 ## Alcance y honestidad
 
-Las 37 ofertas son las verificadas durante la investigación que originó este repositorio (septiembre de 2026), no un censo del mercado. Seis están marcadas como `confianza: "secundaria"` porque no se pudieron confirmar en documentación oficial: el validador las lista cada vez que se ejecuta.
+Las 33 ofertas son las verificadas durante la investigación que originó este repositorio (septiembre de 2026), no un censo del mercado. Dos están marcadas como `confianza: "secundaria"` porque no se pudieron confirmar en documentación oficial: el validador las lista cada vez que se ejecuta.
 
 Los precios cambian sin aviso. Este repositorio no evita ese problema: lo hace **visible**.
