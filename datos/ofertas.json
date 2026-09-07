@@ -516,6 +516,7 @@
         { "plan": "CX33", "vcpu": 4, "procesador": "Intel/AMD", "ram_gb": 8, "almacenamiento_gb": 80, "transferencia_tb": null, "precio_hora_usd": 0.016, "precio_mes_usd": 9.99 },
         { "plan": "CX43", "vcpu": 8, "procesador": "Intel/AMD", "ram_gb": 16, "almacenamiento_gb": 160, "transferencia_tb": null, "precio_hora_usd": 0.030, "precio_mes_usd": 18.49 }
       ],
+      "captura": "fuentes/hetzner-cost-optimized.png",
       "confianza": "oficial",
       "verificado": "2026-09-07",
       "fuentes": ["https://www.hetzner.com/cloud"]
@@ -539,6 +540,7 @@
         { "plan": "CPX32", "vcpu": 4, "procesador": "AMD", "ram_gb": 8, "almacenamiento_gb": 160, "transferencia_tb": null, "precio_hora_usd": 0.067, "precio_mes_usd": 41.99 },
         { "plan": "CPX42", "vcpu": 8, "procesador": "AMD", "ram_gb": 16, "almacenamiento_gb": 320, "transferencia_tb": null, "precio_hora_usd": 0.131, "precio_mes_usd": 81.99 }
       ],
+      "captura": "fuentes/hetzner-regular-perfomance.png",
       "confianza": "oficial",
       "verificado": "2026-09-07",
       "fuentes": ["https://www.hetzner.com/cloud"]
@@ -565,6 +567,7 @@
         { "plan": null, "vcpu": 4, "ram_gb": 8, "almacenamiento_gb": 160, "transferencia_tb": 5.0, "precio_hora_usd": 0.07143, "precio_mes_usd": 48.00 },
         { "plan": null, "vcpu": 8, "ram_gb": 16, "almacenamiento_gb": 320, "transferencia_tb": 6.0, "precio_hora_usd": 0.14286, "precio_mes_usd": 96.00 }
       ],
+      "captura": "fuentes/digital-ocean-basic-droplets.png",
       "confianza": "oficial",
       "verificado": "2026-09-07",
       "fuentes": ["https://www.digitalocean.com/pricing/droplets"]
@@ -591,6 +594,7 @@
         { "plan": "vc2-4c-8gb", "vcpu": 4, "ram_gb": 8, "almacenamiento_gb": 160, "transferencia_tb": 4, "precio_hora_usd": 0.060, "precio_mes_usd": 40.00 },
         { "plan": "vc2-6c-16gb", "vcpu": 6, "ram_gb": 16, "almacenamiento_gb": 320, "transferencia_tb": 5, "precio_hora_usd": 0.119, "precio_mes_usd": 80.00 }
       ],
+      "captura": "fuentes/vultr-cloud-compute.png",
       "confianza": "oficial",
       "verificado": "2026-09-07",
       "fuentes": ["https://www.vultr.com/pricing/"]
@@ -617,6 +621,7 @@
         { "plan": "Linode 32 GB", "vcpu": 8, "ram_gb": 32, "almacenamiento_gb": 640, "transferencia_tb": 16, "red_gbps": "40/7", "precio_hora_usd": 0.2880, "precio_mes_usd": 192.00 },
         { "plan": "Linode 64 GB", "vcpu": 16, "ram_gb": 64, "almacenamiento_gb": 1280, "transferencia_tb": 20, "red_gbps": "40/9", "precio_hora_usd": 0.5760, "precio_mes_usd": 384.00 }
       ],
+      "captura": "fuentes/linode-shared-cpu.png",
       "confianza": "oficial",
       "verificado": "2026-09-07",
       "fuentes": ["https://www.linode.com/pricing/"]
