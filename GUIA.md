@@ -116,6 +116,9 @@ Es tentador reducir una línea de producto a un número, tipo «dólares por GB 
 
 ## Por qué esta guía desconfía de los agregadores
 
-Durante la investigación que originó estos datos se consultó un agregador de niveles gratuitos dirigido a agentes de IA. Sus fichas de Google Cloud y DigitalOcean eran exactas. La de Azure clasificaba la base SQL gratuita como oferta de 12 meses cuando Microsoft documenta que dura **toda la vida de la suscripción** — un error que habría descartado la mejor característica de Azure para el caso que se estaba evaluando.
+Durante la investigación que originó estos datos se consultó un agregador de niveles gratuitos dirigido a agentes de IA. Su ficha de Google Cloud era exacta. Las otras dos que se contrastaron después, no:
+
+- **Azure**: clasificaba la base SQL gratuita como oferta de 12 meses cuando Microsoft documenta que dura **toda la vida de la suscripción**. Un error que habría descartado la mejor característica de Azure para el caso que se estaba evaluando.
+- **DigitalOcean**: cifraba el nivel gratuito de Functions en 25 000 GiB-segundos al mes. La página oficial dice **90 000**, tres veces y media más. Aquí el error iba en la otra dirección: habría hecho descartar por pequeño un nivel que en realidad alcanza para 720 000 invocaciones de una función ligera.
 
 La conclusión no es «los agregadores mienten», sino algo más útil: **sirven para descubrir opciones, no para decidir**. Por eso cada fila de `datos/ofertas.json` lleva su URL y un campo `confianza` que distingue lo confirmado en documentación oficial de lo que no.

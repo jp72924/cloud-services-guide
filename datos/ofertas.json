@@ -323,6 +323,26 @@
       "fuentes": ["https://docs.digitalocean.com/products/app-platform/details/pricing/"]
     },
     {
+      "id": "digitalocean-functions",
+      "proveedor": "DigitalOcean",
+      "servicio": "Functions",
+      "tipo": "funciones-serverless",
+      "gratis": true,
+      "modalidad": "cuota-mensual-renovable",
+      "requiere_tarjeta": true,
+      "caduca": null,
+      "incluye": [
+        { "unidad": "gib-segundo", "cantidad": 90000, "periodo": "mes", "tipo_limite": "cuota-agrupada", "nota": "por cuenta, no por función" }
+      ],
+      "precio": "0 USD hasta 90 000 GiB-segundos al mes",
+      "precio_al_exceder": "0,0000185 USD por GiB-segundo (un millón extra cuesta 18,50 USD)",
+      "notas": "No cobra las invocaciones por separado: todo se factura como GiB-segundos, según la fórmula invocaciones × RAM en GiB × segundos de ejecución. OJO CON EL REDONDEO: la duración mínima facturable es de 100 ms por invocación, así que una función que responde en 5 ms se cobra como si tardara 100, veinte veces más. Para hacerse una idea de la cuota: 90 000 GiB-s dan 720 000 invocaciones de una función de 128 MiB que tarde un segundo, o 180 000 si la función usa 512 MiB. Es el nivel gratuito más pequeño de los cuatro servicios sin servidor de esta base: AWS Lambda y Scaleway dan 400 000 GB-s, equivalentes a 372 529 GiB-s, es decir 4,1 veces más. La cuota no se acumula de un mes al siguiente.",
+      "unidades_binarias": true,
+      "confianza": "oficial",
+      "verificado": "2026-09-07",
+      "fuentes": ["https://www.digitalocean.com/pricing/functions"]
+    },
+    {
       "id": "digitalocean-app-platform-basico",
       "proveedor": "DigitalOcean",
       "servicio": "App Platform — servicio web básico",

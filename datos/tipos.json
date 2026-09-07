@@ -56,7 +56,7 @@
       "que_es": "Subes una función suelta y se ejecuta cuando algo la dispara, sin que exista un servidor tuyo esperando.",
       "para_que_sirve": "Tareas cortas y esporádicas: responder a un webhook, procesar una subida, ejecutar algo cada hora.",
       "unidades": ["invocacion", "gb-segundo", "peticion"],
-      "trampas": ["Hay límites duros de duración y de tamaño de la petición (AWS Lambda corta en 6 MB por invocación síncrona).", "Mantener estado entre llamadas no es fiable: cada ejecución puede ser una máquina distinta."],
+      "trampas": ["Hay límites duros de duración y de tamaño de la petición (AWS Lambda corta en 6 MB por invocación síncrona).", "Mantener estado entre llamadas no es fiable: cada ejecución puede ser una máquina distinta.", "Cuidado con el redondeo mínimo por invocación: DigitalOcean factura un mínimo de 100 ms, así que una función que responde en 5 ms se cobra veinte veces su coste real. Conviene mirarlo antes de trocear la lógica en muchas funciones diminutas."],
       "ejemplos_proveedor": ["AWS Lambda", "Azure Functions", "DigitalOcean Functions", "Scaleway Serverless Functions"]
     },
     {
