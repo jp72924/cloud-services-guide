@@ -80,9 +80,10 @@ console.log(d.ofertas.filter(o=>o.caduca).map(o=>o.proveedor+' → '+o.caduca).j
 Cuando un proveedor publica una tabla de tamaños (típico en máquinas virtuales), la oferta lleva un array `planes` con la tabla entera, y `precio` resume el rango. Dos campos evitan comparaciones erróneas entre proveedores:
 
 - `unidades_binarias: true` marca a quien expresa memoria y disco en GiB en vez de GB. La diferencia es del 7,4 %.
-- `transferencia_tb: null` distingue «no incluye transferencia» de «no la publica en esta tabla».
+- `transferencia_tb: null` significa «no lo publica en esta tabla», que no es lo mismo que `transferencia_ilimitada: true`, ni que un número. Son tres estados distintos y confundirlos hace leer como carencia lo que a veces es una ventaja.
+- `almacenamiento_gb: null` marca a quien no incluye disco y lo cobra aparte, como Fly.io con sus volúmenes.
 
-El validador comprueba además que el precio mensual nunca supere las 730 horas a tarifa horaria. Comparar esa cifra entre los 44 escalones cargados revela algo que ninguna tabla dice en voz alta: **cuánto descuenta cada proveedor por dejar la máquina encendida**.
+El validador comprueba además que el precio mensual nunca supere las 730 horas a tarifa horaria. Comparar esa cifra entre los 48 escalones cargados revela algo que ninguna tabla dice en voz alta: **cuánto descuenta cada proveedor por dejar la máquina encendida**.
 
 | Proveedor | Horas implícitas | Descuento frente al mes real |
 |---|---|---|
@@ -93,6 +94,8 @@ El validador comprueba además que el precio mensual nunca supere las 730 horas 
 | Fly.io | 718–725 | ~1 % |
 
 Fly.io es el caso distinto: factura por segundo, así que su precio «mensual» es una equivalencia a 30 días y no un tope. Por eso ronda las 720 horas y prácticamente no descuenta. En los demás, el precio mensual sí es un techo.
+
+OVHcloud no aparece en la tabla porque **no publica tarifa horaria**: su línea de VPS se contrata por meses y no hay forma de pagar solo por el rato de uso. La ausencia de una cifra también es información.
 
 ## Alcance y honestidad
 
