@@ -92,7 +92,7 @@ Todas encontradas verificando ofertas reales, no hipotéticas.
 10. **La cuota es por cuenta, no por servicio.** Dos aplicaciones en la misma cuenta comparten el mismo nivel gratuito.
 11. **Sobreprecio regional, y tablas que ya vienen con región.** La misma máquina en São Paulo cuesta entre un 30 % y un 40 % más que en Virginia. Peor aún: algunos proveedores publican una tabla de precios **distinta por región**, así que las cifras que estás leyendo pueden no ser las tuyas. Fly.io es el caso claro entre los comparados aquí; sus precios registrados corresponden a Ámsterdam.
 12. **«Al mes» no siempre significa un tope.** En la mayoría de proveedores el precio mensual es un techo: por mucho que corra la máquina, no pagas más. Pero quien factura por segundo suele publicar como «mes» la equivalencia de 30 días, y un mes real tiene 30,4. Fly.io funciona así: sus horas implícitas rondan 720 frente a las 613-672 de los demás, es decir, casi ningún descuento por dejar la máquina encendida.
-12. **Gratis sin garantías.** Microsoft dice explícitamente que su plan gratuito de App Service «no está soportado para cargas de producción». Ningún plan gratuito tiene SLA.
+13. **Gratis sin garantías.** Microsoft dice explícitamente que su plan gratuito de App Service «no está soportado para cargas de producción». Ningún plan gratuito tiene SLA.
 
 ---
 
