@@ -75,9 +75,11 @@ for (const o of ofertas.ofertas) {
 
   for (const p of o.planes ?? []) {
     const etiqueta = p.plan ?? `${p.vcpu} vCPU / ${p.ram_gb} GB`;
-    for (const campo of ['vcpu', 'ram_gb', 'almacenamiento_gb', 'precio_mes_usd'])
+    for (const campo of ['vcpu', 'ram_gb', 'precio_mes_usd'])
       if (typeof p[campo] !== 'number')
         fallo(`oferta "${o.id}", plan "${etiqueta}": ${campo} debe ser numérico`);
+    if (!(typeof p.almacenamiento_gb === 'number' || p.almacenamiento_gb === null))
+      fallo(`oferta "${o.id}", plan "${etiqueta}": almacenamiento_gb debe ser numérico o null (null = no incluye disco)`);
     // El mes nunca debería costar más que las 730 horas del mes a tarifa horaria.
     if (typeof p.precio_hora_usd === 'number' && p.precio_hora_usd > 0) {
       const horas = p.precio_mes_usd / p.precio_hora_usd;

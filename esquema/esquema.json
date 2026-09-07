@@ -67,10 +67,11 @@
         "vcpu": { "type": "number" },
         "procesador": { "type": "string" },
         "ram_gb": { "type": "number", "description": "Si la oferta tiene unidades_binarias, esta cifra viene expresada en GiB." },
-        "almacenamiento_gb": { "type": "number" },
+        "almacenamiento_gb": { "type": ["number", "null"], "description": "Disco incluido. null cuando el proveedor no incluye ninguno y lo cobra aparte, como hace Fly.io con sus volúmenes." },
         "transferencia_tb": { "type": ["number", "null"], "description": "null si la tabla del proveedor no publica transferencia incluida." },
         "red_gbps": { "type": "string" },
         "precio_hora_usd": { "type": "number" },
+        "precio_segundo_usd": { "type": "number", "description": "Solo para proveedores que facturan por segundo. Su presencia indica que el precio mensual es una equivalencia, no un tope." },
         "precio_mes_usd": { "type": "number" }
       }
     },

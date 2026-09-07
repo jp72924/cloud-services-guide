@@ -82,7 +82,17 @@ Cuando un proveedor publica una tabla de tamaños (típico en máquinas virtuale
 - `unidades_binarias: true` marca a quien expresa memoria y disco en GiB en vez de GB. La diferencia es del 7,4 %.
 - `transferencia_tb: null` distingue «no incluye transferencia» de «no la publica en esta tabla».
 
-El validador comprueba además que el precio mensual nunca supere las 730 horas a tarifa horaria. En los 28 escalones cargados el máximo es 714, lo que revela algo que ninguna tabla dice en voz alta: **ningún proveedor cobra el mes completo a tarifa horaria**, así que dejar una máquina encendida siempre sale más barato que la suma de sus horas.
+El validador comprueba además que el precio mensual nunca supere las 730 horas a tarifa horaria. Comparar esa cifra entre los 44 escalones cargados revela algo que ninguna tabla dice en voz alta: **cuánto descuenta cada proveedor por dejar la máquina encendida**.
+
+| Proveedor | Horas implícitas | Descuento frente al mes real |
+|---|---|---|
+| Hetzner (CX y CPX) | 613–649 | 13–15 % |
+| Linode | 667 | 9 % |
+| DigitalOcean | 672 | 8 % |
+| Vultr | 625–714 | 8 % |
+| Fly.io | 718–725 | ~1 % |
+
+Fly.io es el caso distinto: factura por segundo, así que su precio «mensual» es una equivalencia a 30 días y no un tope. Por eso ronda las 720 horas y prácticamente no descuenta. En los demás, el precio mensual sí es un techo.
 
 ## Alcance y honestidad
 
