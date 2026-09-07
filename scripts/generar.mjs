@@ -45,7 +45,7 @@ const seccionOfertas = ofertas.ofertas
       (p) => `<tr>
     <td>${p.plan ? esc(p.plan) : '<span class="nota">sin nombre</span>'}${p.procesador ? ` <span class="nota">${esc(p.procesador)}</span>` : ''}</td>
     <td class="n">${p.vcpu}</td><td class="n">${p.ram_gb}</td><td class="n">${p.almacenamiento_gb == null ? '—' : p.almacenamiento_gb}</td>
-    <td class="n">${p.transferencia_tb == null ? '—' : p.transferencia_tb + ' TB'}</td>
+    <td class="n">${p.transferencia_ilimitada ? 'ilimitada' : p.transferencia_tb == null ? '—' : p.transferencia_tb + ' TB'}</td>
     <td class="n">${p.precio_hora_usd != null ? p.precio_hora_usd.toFixed(5).replace(/0+$/, '').replace(/\.$/, '') : '—'}</td>
     <td class="n destacado">${p.precio_mes_usd.toFixed(2)}</td>
   </tr>`,

@@ -656,9 +656,17 @@
       "requiere_tarjeta": false,
       "caduca": null,
       "incluye": [],
-      "precio": "desde 4,54 USD/mes",
-      "notas": "Sin nivel gratuito. Anunció subidas escalonadas del 9-11 % entre 2026 y 2028 por el coste de la memoria.",
-      "confianza": "secundaria",
+      "precio": "de 4,54 a 23,37 USD/mes. NO publica tarifa horaria: la línea se contrata por meses.",
+      "notas": "EL MEJOR PRECIO POR GB DE RAM DE TODAS LAS LÍNEAS COMPARADAS: de 1,13 USD al mes en el VPS-1 a 0,97 en el VPS-4, por debajo incluso del 1,16 del mejor escalón de la línea CX de Hetzner. Sus cuatro planes baten al mejor de Hetzner. Es también la única que anuncia TRÁFICO ILIMITADO —el límite real pasa a ser el ancho de banda del enlace, de 500 Mbps a 3 Gbps— y la única que incluye copia de seguridad diaria de las últimas 24 horas. Dos advertencias que compensan lo anterior: los precios se anuncian como «starting at», o sea que son de captación y la renovación suele ser más cara, y OVHcloud anunció subidas escalonadas del 9-11 % entre 2026 y 2028 por el coste de la memoria. Al no haber tarifa horaria, tampoco hay forma de pagar solo por el rato que la uses.",
+      "unidades_binarias": false,
+      "captura": "fuentes/ovhcloud-vps.png",
+      "planes": [
+        { "plan": "VPS-1", "vcpu": 2, "ram_gb": 4, "almacenamiento_gb": 40, "transferencia_tb": null, "transferencia_ilimitada": true, "red_gbps": "0.5", "precio_mes_usd": 4.54 },
+        { "plan": "VPS-2", "vcpu": 4, "ram_gb": 8, "almacenamiento_gb": 75, "transferencia_tb": null, "transferencia_ilimitada": true, "red_gbps": "1", "precio_mes_usd": 8.50 },
+        { "plan": "VPS-3", "vcpu": 6, "ram_gb": 12, "almacenamiento_gb": 100, "transferencia_tb": null, "transferencia_ilimitada": true, "red_gbps": "2", "precio_mes_usd": 12.32 },
+        { "plan": "VPS-4", "vcpu": 8, "ram_gb": 24, "almacenamiento_gb": 200, "transferencia_tb": null, "transferencia_ilimitada": true, "red_gbps": "3", "precio_mes_usd": 23.37 }
+      ],
+      "confianza": "oficial",
       "verificado": "2026-09-07",
       "fuentes": ["https://www.ovhcloud.com/en/vps/"]
     },
