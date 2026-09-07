@@ -73,6 +73,19 @@ for (const o of ofertas.ofertas) {
       fallo(`oferta "${o.id}": tipo_limite "${c.tipo_limite}" no existe`);
   }
 
+  for (const p of o.planes ?? []) {
+    const etiqueta = p.plan ?? `${p.vcpu} vCPU / ${p.ram_gb} GB`;
+    for (const campo of ['vcpu', 'ram_gb', 'almacenamiento_gb', 'precio_mes_usd'])
+      if (typeof p[campo] !== 'number')
+        fallo(`oferta "${o.id}", plan "${etiqueta}": ${campo} debe ser numérico`);
+    // El mes nunca debería costar más que las 730 horas del mes a tarifa horaria.
+    if (typeof p.precio_hora_usd === 'number' && p.precio_hora_usd > 0) {
+      const horas = p.precio_mes_usd / p.precio_hora_usd;
+      if (horas > 730)
+        fallo(`oferta "${o.id}", plan "${etiqueta}": el mes equivale a ${Math.round(horas)} h de tarifa horaria, más que las 730 h del mes. Revisa las cifras.`);
+    }
+  }
+
   const dias = Math.floor((hoy - new Date(o.verificado)) / 86400000);
   if (dias > DIAS_PARA_REVERIFICAR) viejas.push({ id: o.id, proveedor: o.proveedor, dias });
   if (o.confianza === 'secundaria')

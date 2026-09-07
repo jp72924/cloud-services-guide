@@ -30,7 +30,8 @@ Si se mezclaran en un solo documento, todo caducaría a la velocidad de lo más 
 GUIA.md              La guía legible: cómo leer una oferta sin que te engañen
 datos/unidades.json  46 unidades, con explicación en lenguaje llano
 datos/tipos.json     71 tipos de servicio en 10 familias
-datos/ofertas.json   33 ofertas verificadas, con fecha y fuente
+datos/ofertas.json   36 ofertas verificadas, con fecha y fuente
+                     (5 de ellas con la tabla de planes completa: 28 escalones)
 esquema/esquema.json El contrato de los datos y las reglas de integridad
 scripts/validar.mjs  Valida y avisa de lo que está viejo
 scripts/generar.mjs  Genera guia.html desde los datos
@@ -74,8 +75,17 @@ node -e "const d=require('./datos/ofertas.json');
 console.log(d.ofertas.filter(o=>o.caduca).map(o=>o.proveedor+' → '+o.caduca).join('\n'))"
 ```
 
+### Líneas con varios escalones
+
+Cuando un proveedor publica una tabla de tamaños (típico en máquinas virtuales), la oferta lleva un array `planes` con la tabla entera, y `precio` resume el rango. Dos campos evitan comparaciones erróneas entre proveedores:
+
+- `unidades_binarias: true` marca a quien expresa memoria y disco en GiB en vez de GB. La diferencia es del 7,4 %.
+- `transferencia_tb: null` distingue «no incluye transferencia» de «no la publica en esta tabla».
+
+El validador comprueba además que el precio mensual nunca supere las 730 horas a tarifa horaria. En los 28 escalones cargados el máximo es 714, lo que revela algo que ninguna tabla dice en voz alta: **ningún proveedor cobra el mes completo a tarifa horaria**, así que dejar una máquina encendida siempre sale más barato que la suma de sus horas.
+
 ## Alcance y honestidad
 
-Las 33 ofertas son las verificadas durante la investigación que originó este repositorio (septiembre de 2026), no un censo del mercado. Diez están marcadas como `confianza: "secundaria"` porque no se pudieron confirmar en documentación oficial: el validador las lista cada vez que se ejecuta.
+Las 36 ofertas son las verificadas durante la investigación que originó este repositorio (septiembre de 2026), no un censo del mercado. Ocho están marcadas como `confianza: "secundaria"` porque no se pudieron confirmar en documentación oficial: el validador las lista cada vez que se ejecuta.
 
 Los precios cambian sin aviso. Este repositorio no evita ese problema: lo hace **visible**.

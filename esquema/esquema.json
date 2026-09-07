@@ -58,6 +58,22 @@
         "nota": { "type": "string" }
       }
     },
+    "plan": {
+      "type": "object",
+      "description": "Un escalón concreto dentro de una línea de producto (por ejemplo un tamaño de máquina virtual). Permite guardar la tabla de precios entera dentro de la oferta.",
+      "required": ["vcpu", "ram_gb", "almacenamiento_gb", "precio_mes_usd"],
+      "properties": {
+        "plan": { "type": ["string", "null"], "description": "Nombre comercial. null si el proveedor no lo publica y el plan se identifica solo por recursos." },
+        "vcpu": { "type": "number" },
+        "procesador": { "type": "string" },
+        "ram_gb": { "type": "number", "description": "Si la oferta tiene unidades_binarias, esta cifra viene expresada en GiB." },
+        "almacenamiento_gb": { "type": "number" },
+        "transferencia_tb": { "type": ["number", "null"], "description": "null si la tabla del proveedor no publica transferencia incluida." },
+        "red_gbps": { "type": "string" },
+        "precio_hora_usd": { "type": "number" },
+        "precio_mes_usd": { "type": "number" }
+      }
+    },
     "oferta": {
       "type": "object",
       "required": ["id", "proveedor", "servicio", "tipo", "gratis", "modalidad", "precio", "confianza", "verificado", "fuentes"],
@@ -71,6 +87,8 @@
         "requiere_tarjeta": { "type": ["boolean", "null"] },
         "caduca": { "type": ["string", "null"], "description": "Fecha o descripción del vencimiento. null = no caduca." },
         "incluye": { "type": "array", "items": { "$ref": "#/$defs/cantidad" }, "description": "Responde al '¿qué ofrece?', en las unidades del tipo." },
+        "planes": { "type": "array", "items": { "$ref": "#/$defs/plan" }, "description": "Tabla de escalones de la línea, cuando el proveedor publica varios tamaños." },
+        "unidades_binarias": { "type": "boolean", "description": "true si el proveedor expresa memoria y disco en MiB/GiB en vez de MB/GB. Un GiB es un 7,4 % mayor: sin esta marca, las comparaciones entre proveedores se desvían." },
         "precio": { "type": "string" },
         "precio_al_exceder": { "type": "string" },
         "notas": { "type": "string" },

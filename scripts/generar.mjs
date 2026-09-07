@@ -37,9 +37,24 @@ const seccionOfertas = ofertas.ofertas
     const f = fPorId.get(t?.familia);
     const m = mPorId.get(o.modalidad);
     const busca = [o.proveedor, o.servicio, t?.nombre, f?.nombre, ...(t?.alias ?? [])].join(' ').toLowerCase();
+    const tablaPlanes = (o.planes ?? []).length
+      ? `<div class="tabla-planes"><table>
+  <thead><tr><th>Plan</th><th>vCPU</th><th>RAM${o.unidades_binarias ? ' (GiB)' : ''}</th><th>Disco${o.unidades_binarias ? ' (GiB)' : ''}</th><th>Transf.</th><th>$/h</th><th>$/mes</th></tr></thead>
+  <tbody>${o.planes
+    .map(
+      (p) => `<tr>
+    <td>${p.plan ? esc(p.plan) : '<span class="nota">sin nombre</span>'}${p.procesador ? ` <span class="nota">${esc(p.procesador)}</span>` : ''}</td>
+    <td class="n">${p.vcpu}</td><td class="n">${p.ram_gb}</td><td class="n">${p.almacenamiento_gb}</td>
+    <td class="n">${p.transferencia_tb == null ? '—' : p.transferencia_tb + ' TB'}</td>
+    <td class="n">${p.precio_hora_usd != null ? p.precio_hora_usd.toFixed(5).replace(/0+$/, '').replace(/\.$/, '') : '—'}</td>
+    <td class="n destacado">${p.precio_mes_usd.toFixed(2)}</td>
+  </tr>`,
+    )
+    .join('')}</tbody></table></div>`
+      : '';
     const incluye = (o.incluye ?? []).length
-      ? `<ul class="incluye">${o.incluye.map((c) => `<li>${cantidadTexto(c)}</li>`).join('')}</ul>`
-      : '<p class="vacio">Sin cantidades publicadas.</p>';
+      ? `<ul class="incluye">${o.incluye.map((c) => `<li>${cantidadTexto(c)}</li>`).join('')}</ul>${tablaPlanes}`
+      : tablaPlanes || '<p class="vacio">Sin cantidades publicadas.</p>';
     return `
 <article class="oferta" data-busca="${esc(busca)}" data-familia="${esc(t?.familia ?? '')}" data-gratis="${o.gratis}">
   <header class="oferta-cab">
@@ -196,6 +211,13 @@ input[type=search]{flex:1;min-width:220px}
 .preguntas dd{margin:0;font-size:15px}
 .incluye{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:4px}
 .nota{color:var(--muted);font-size:13px}
+.tabla-planes{overflow-x:auto;margin-top:10px;border:1px solid var(--rule);border-radius:8px}
+.tabla-planes table{border-collapse:collapse;width:100%;min-width:520px;font-size:13.5px}
+.tabla-planes th{text-align:left;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);background:var(--surface-alt);padding:8px 11px;white-space:nowrap}
+.tabla-planes td{padding:8px 11px;border-top:1px solid var(--rule-soft);white-space:nowrap}
+.tabla-planes .n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tabla-planes .destacado{font-weight:600;color:var(--teal-deep)}
+:root[data-theme="dark"] .tabla-planes .destacado,:root:not([data-theme="light"]) .tabla-planes .destacado{color:var(--teal)}
 .vacio{color:var(--muted);font-style:italic;margin:0}
 .familia{margin-bottom:26px}
 .familia-tit{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid var(--teal-wash)}
