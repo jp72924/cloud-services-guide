@@ -263,6 +263,28 @@
       "fuentes": ["https://repost.aws/articles/ARi_gf6vo6TuqNtMQdiYPKyA/announcing-amazon-ec2-t4g-free-trial-extension"]
     },
     {
+      "id": "aws-ec2-micro-12-meses",
+      "proveedor": "AWS",
+      "servicio": "EC2 t2.micro / t3.micro (nivel gratuito de 12 meses, heredado)",
+      "tipo": "maquina-virtual",
+      "gratis": true,
+      "modalidad": "gratis-tiempo-limitado",
+      "requiere_tarjeta": true,
+      "caduca": "12 meses desde el alta; solo cuentas creadas antes del 15 de julio de 2025",
+      "incluye": [
+        { "unidad": "vcpu-hora", "cantidad": 750, "periodo": "mes", "nota": "horas de instancia t2.micro, Linux y Windows contadas por separado; agregado entre regiones. Donde no hay t2.micro (p. ej. Estocolmo, Baréin) vale t3.micro" },
+        { "unidad": "gb-mes", "cantidad": 30, "periodo": "mes", "nota": "EBS (standard, st1, sc1, gp2, gp3); cifra del programa histórico, no reconfirmada en la documentación actual" }
+      ],
+      "precio": "0 USD dentro de la cuota; fuera de ella se factura a tarifa normal",
+      "notas": "Programa heredado: ya no se concede. Como el plazo es de 12 meses desde el alta y la última alta posible fue el 14-jul-2025, deduzco que ha expirado para todas las cuentas hacia el 14-jul-2026 (inferencia, no lo dice AWS). Las cuentas nuevas (desde el 15-jul-2025) no tienen cuota de horas sino crédito: ver aws-plan-gratuito-cuenta. En ellas la consola marca como elegibles t3.micro, t3.small, t4g.micro, t4g.small, c7i-flex.large y m7i-flex.large, pero consumen crédito y no pueden pasarse del límite. t4g.micro no existe en el programa heredado. Las 750 h/mes cubren una instancia encendida todo el mes (un mes de 31 días son 744 h).",
+      "confianza": "oficial",
+      "verificado": "2026-10-09",
+      "fuentes": [
+        "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-free-tier-usage.html",
+        "https://aws.amazon.com/free/legacy/free-tier-faqs"
+      ]
+    },
+    {
       "id": "oracle-always-free-arm",
       "proveedor": "Oracle Cloud",
       "servicio": "Always Free — Ampere A1 (ARM)",
