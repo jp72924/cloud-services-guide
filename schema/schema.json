@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Cloud services knowledge base schema",
+  "description": "Contract for the three data files. The stable layer (types, units) answers what each service is and what it is measured in; the volatile layer (offers) answers who provides it, how much of it, and at what price. All prose in data/ is the canonical English text; Spanish translations live in locales/es/, keyed by the same ids.",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Lowercase kebab-case identifier."
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO date, year-month-day."
+    },
+    "unit": {
+      "type": "object",
+      "required": ["id", "name", "dimension", "what_it_measures", "plain_words"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string" },
+        "dimension": { "$ref": "#/$defs/id", "description": "Id of the physical or commercial dimension being measured. Its display name lives in locales/<lang>/ui.json under dimensions." },
+        "what_it_measures": { "type": "string", "description": "Technical definition in one sentence." },
+        "plain_words": { "type": "string", "description": "The same idea without jargon. Required: it is what makes the guide readable by anyone." },
+        "formula": { "type": "string" },
+        "handy_equivalent": { "type": "string", "description": "A concrete reference that gives the quantity a sense of scale." },
+        "warning": { "type": "string" },
+        "typical_limit_type": { "$ref": "#/$defs/id" },
+        "used_in": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "type": {
+      "type": "object",
+      "required": ["id", "family", "name", "what_it_is", "purpose", "units"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "family": { "$ref": "#/$defs/id" },
+        "name": { "type": "string" },
+        "aliases": { "type": "array", "items": { "type": "string" }, "description": "What the industry calls it, so it can be found by searching." },
+        "what_it_is": { "type": "string" },
+        "purpose": { "type": "string", "description": "What it is for." },
+        "units": { "type": "array", "items": { "$ref": "#/$defs/id" }, "description": "Units in which this type is measured and billed." },
+        "pitfalls": { "type": "array", "items": { "type": "string" } },
+        "provider_examples": { "type": "array", "items": { "type": "string" }, "description": "Product names; not translated. If an entry is a phrase rather than a name, locales/<lang>/types.json may override the whole array." }
+      }
+    },
+    "quantity": {
+      "type": "object",
+      "required": ["unit", "amount"],
+      "properties": {
+        "unit": { "$ref": "#/$defs/id" },
+        "amount": { "type": "number" },
+        "period": { "enum": ["day", "month", "year", null] },
+        "limit_type": {
+          "enum": ["pooled-quota", "per-request-cap", "daily-cap", "concurrency-cap"],
+          "description": "THE KEY DISTINCTION. A monthly pool and a per-request cap are not comparable: the latter makes expensive operations fail even when quota is left over."
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "description": "A concrete tier within a product line (for example a virtual machine size). Lets the whole price table live inside the offer.",
+      "required": ["vcpu", "ram_gb", "storage_gb", "monthly_price_usd"],
+      "properties": {
+        "plan": { "type": ["string", "null"], "description": "Commercial name. null if the provider does not publish one and the plan is identified by its resources alone." },
+        "vcpu": { "type": "number" },
+        "processor": { "type": "string" },
+        "ram_gb": { "type": "number", "description": "If the offer has binary_units, this figure is expressed in GiB." },
+        "storage_gb": { "type": ["number", "null"], "description": "Included disk. null when the provider includes none and charges for it separately, as Fly.io does with its volumes." },
+        "transfer_tb": { "type": ["number", "null"], "description": "null if the provider's table does not publish included transfer. If the provider advertises it as unlimited, use transfer_unlimited: 'not published' and 'no limit' are different things." },
+        "transfer_unlimited": { "type": "boolean", "description": "true when the provider advertises unlimited traffic. It is usually bounded by the link bandwidth, which is the real limit." },
+        "network_gbps": { "type": "string", "description": "Link bandwidth. Some providers publish a single figure and others split inbound and outbound as inbound/outbound." },
+        "hourly_price_usd": { "type": "number" },
+        "per_second_price_usd": { "type": "number", "description": "Only for providers that bill per second. Its presence means the monthly price is an equivalence, not a ceiling." },
+        "monthly_price_usd": { "type": "number" }
+      }
+    },
+    "offer": {
+      "type": "object",
+      "required": ["id", "provider", "service", "type", "free", "pricing_model", "price", "confidence", "verified", "sources"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "provider": { "type": "string", "description": "Who offers it." },
+        "service": { "type": "string", "description": "Its commercial name." },
+        "type": { "$ref": "#/$defs/id", "description": "Reference to types.json: it provides the what-it-is and what-it-is-for." },
+        "free": { "type": "boolean" },
+        "pricing_model": { "$ref": "#/$defs/id", "description": "Answers 'how long does it last?': by time or by consumption quota." },
+        "card_required": { "type": ["boolean", "null"] },
+        "expires": { "type": ["string", "null"], "description": "Expiry date or a description of it. null = does not expire." },
+        "includes": { "type": "array", "items": { "$ref": "#/$defs/quantity" }, "description": "Answers 'what does it offer?', in the units of the type." },
+        "plans": { "type": "array", "items": { "$ref": "#/$defs/plan" }, "description": "Tier table of the line, when the provider publishes several sizes." },
+        "binary_units": { "type": "boolean", "description": "true if the provider expresses memory and disk in MiB/GiB instead of MB/GB. A GiB is 7.4 % larger: without this flag, comparisons across providers drift." },
+        "pricing_region": { "type": "string", "description": "Region the recorded prices belong to, for providers whose price table varies by region." },
+        "price": { "type": "string" },
+        "overage_price": { "type": "string" },
+        "notes": { "type": "string" },
+        "confidence": {
+          "enum": ["official", "secondary"],
+          "description": "'official' = verified in the provider's own documentation. 'secondary' = another source; treat with caution."
+        },
+        "verified": { "$ref": "#/$defs/date" },
+        "sources": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "uri" }, "description": "Required. A row without a source does not go in." },
+        "screenshot": { "type": "string", "description": "Path under sources/ to a capture of the official price table." }
+      }
+    }
+  },
+  "integrity_rules": [
+    "Every type.family must exist in types.json/families",
+    "Every unit cited in type.units must exist in units.json",
+    "Every offer.type must exist in types.json",
+    "Every offer.includes[].unit must exist in units.json",
+    "Every offer.pricing_model must exist in offers.json/pricing_models",
+    "Every limit_type must exist in units.json/limit_types",
+    "Every unit.dimension must exist in locales/<lang>/ui.json/dimensions",
+    "Identifiers are unique within their file",
+    "Every offer has a verification date and at least one source",
+    "i18n: every id in data/ has an entry in locales/es/ and vice versa; lists (aliases, pitfalls, include_notes) have the same length in both languages"
+  ]
+}

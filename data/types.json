@@ -1,0 +1,987 @@
+{
+  "version": 1,
+  "updated": "2026-09-07",
+  "description": "Catalog of internet and cloud service types. Stable layer: it answers what each thing is, what it is for, and what units it is measured in. It contains no prices or specific providers: those live in offers.json.",
+  "families": [
+    { "id": "compute", "name": "Compute", "summary": "Where your code runs." },
+    { "id": "storage", "name": "Storage", "summary": "Where your files live." },
+    { "id": "databases", "name": "Databases", "summary": "Where your structured data lives." },
+    { "id": "networking", "name": "Networking and delivery", "summary": "How your service reaches the people who use it." },
+    { "id": "communication", "name": "Communication", "summary": "How your system talks to people." },
+    { "id": "identity", "name": "Identity and security", "summary": "Who gets in and what they can do." },
+    { "id": "operations", "name": "Development and operations", "summary": "How you build, publish, and monitor." },
+    { "id": "content", "name": "Content and applications", "summary": "Ready-made product building blocks." },
+    { "id": "ai", "name": "Artificial intelligence", "summary": "Services that interpret or generate content." },
+    { "id": "orchestration", "name": "Job orchestration", "summary": "What runs, when, and in what order." }
+  ],
+  "types": [
+    {
+      "id": "virtual-machine",
+      "family": "compute",
+      "name": "Virtual machine (VM, IaaS)",
+      "aliases": ["VPS", "droplet", "instance", "EC2", "Compute Engine"],
+      "what_it_is": "A complete computer that you rent by the hour, with its own operating system, and over which you have full control.",
+      "purpose": "Run anything without platform restrictions, when you need to be in charge of the environment or the provider doesn't offer something more convenient.",
+      "units": ["vcpu-hour", "ocpu-hour", "gb-month", "gb-egress"],
+      "pitfalls": [
+        "You pay for it while it's on, even if nobody is using it.",
+        "Administration is on you: security patches, certificates, reboots."
+      ],
+      "provider_examples": ["Oracle Compute", "AWS EC2", "Hetzner", "Vultr", "Google Compute Engine"]
+    },
+    {
+      "id": "dedicated-server",
+      "family": "compute",
+      "name": "Dedicated server (bare metal)",
+      "aliases": ["bare metal", "physical server"],
+      "what_it_is": "An entire physical machine just for you, with no processor shared with other customers.",
+      "purpose": "Constant, heavy workloads, or when performance can't depend on what the neighbors are doing.",
+      "units": ["vcpu-hour", "gb-month", "gb-egress"],
+      "pitfalls": [
+        "It's contracted by the month, not by the hour: not suited to one-off spikes.",
+        "No neighbors, but also no automatic migration if the hardware fails."
+      ],
+      "provider_examples": ["Hetzner", "OVHcloud", "HostDime"]
+    },
+    {
+      "id": "managed-containers",
+      "family": "compute",
+      "name": "Managed containers (CaaS)",
+      "aliases": ["Cloud Run", "Container Apps", "App Runner", "serverless containers"],
+      "what_it_is": "You hand over a container image and the provider runs it, scales it, and shuts it down without you administering servers.",
+      "purpose": "Publish an application with a Dockerfile and forget about the machine, paying for actual use.",
+      "units": ["vcpu-second", "gib-second", "request", "gb-egress"],
+      "pitfalls": [
+        "When it scales to zero, the first visit after a quiet spell waits for the cold start.",
+        "Free quotas are usually per account, not per service."
+      ],
+      "provider_examples": [
+        "Google Cloud Run",
+        "Azure Container Apps",
+        "Scaleway Serverless Containers",
+        "IBM Code Engine"
+      ]
+    },
+    {
+      "id": "serverless-functions",
+      "family": "compute",
+      "name": "Serverless functions (FaaS)",
+      "aliases": ["Lambda", "Functions", "functions"],
+      "what_it_is": "You upload a standalone function and it runs when something triggers it, with no server of yours sitting there waiting.",
+      "purpose": "Short, sporadic tasks: responding to a webhook, processing an upload, running something every hour.",
+      "units": ["invocation", "gb-second", "request"],
+      "pitfalls": [
+        "There are hard limits on duration and request size (AWS Lambda cuts off at 6 MB per synchronous invocation).",
+        "Keeping state between calls isn't reliable: each execution may run on a different machine.",
+        "Watch out for the minimum rounding per invocation: DigitalOcean bills a minimum of 100 ms, so a function that responds in 5 ms is charged twenty times its real cost. It's worth checking this before splitting your logic into many tiny functions."
+      ],
+      "provider_examples": ["AWS Lambda", "Azure Functions", "DigitalOcean Functions", "Scaleway Serverless Functions"]
+    },
+    {
+      "id": "edge-compute",
+      "family": "compute",
+      "name": "Edge compute",
+      "aliases": ["Workers", "edge functions", "distributed compute"],
+      "what_it_is": "Your code runs in hundreds of cities at once, at the network point closest to each visitor.",
+      "purpose": "Very fast responses worldwide without choosing a region, and lightweight work in front of a heavier system.",
+      "units": ["request", "cpu-ms-per-request"],
+      "pitfalls": [
+        "The limit is usually a PER-REQUEST CAP on CPU milliseconds, not a monthly pool: an expensive operation always fails.",
+        "It isn't full Node.js: some system APIs don't exist."
+      ],
+      "provider_examples": ["Cloudflare Workers", "Deno Deploy", "Vercel Edge Functions"]
+    },
+    {
+      "id": "application-platform",
+      "family": "compute",
+      "name": "Application platform (PaaS)",
+      "aliases": ["App Platform", "App Service", "Heroku-like"],
+      "what_it_is": "You connect a repository and the platform builds, deploys, and serves the application for you.",
+      "purpose": "Publish quickly without touching infrastructure, with automatic deployment on every code change.",
+      "units": ["vcpu-hour", "cpu-minutes-per-day", "gb-egress"],
+      "pitfalls": [
+        "Free plans usually suspend the application when it's inactive and take close to a minute to wake it up.",
+        "Some free plans don't allow a custom certificate on your own domain."
+      ],
+      "provider_examples": ["Azure App Service", "DigitalOcean App Platform", "Render", "Koyeb", "Railway"]
+    },
+    {
+      "id": "managed-kubernetes",
+      "family": "compute",
+      "name": "Managed Kubernetes",
+      "aliases": ["EKS", "GKE", "AKS", "OKE", "k8s"],
+      "what_it_is": "The provider maintains the brain of the cluster and you supply the machines where your containers run.",
+      "purpose": "Coordinate many services that are deployed and scaled independently.",
+      "units": ["vcpu-hour", "gb-month", "gb-egress"],
+      "pitfalls": [
+        "The control plane is sometimes billed separately and sometimes free: it varies by provider.",
+        "It's the option with the most operational complexity in the catalog; it's rarely justified for fewer than about ten services."
+      ],
+      "provider_examples": ["Google GKE", "AWS EKS", "Azure AKS", "Oracle OKE", "Magalu Cloud"]
+    },
+    {
+      "id": "batch-jobs",
+      "family": "compute",
+      "name": "Batch jobs",
+      "aliases": ["batch jobs", "jobs"],
+      "what_it_is": "Runs that start, process a volume of work, and finish, without serving requests.",
+      "purpose": "Process files, generate reports, migrate data: long-running things nobody is waiting on at a screen.",
+      "units": ["vcpu-second", "gb-second"],
+      "pitfalls": ["Using spare capacity (spot) is much cheaper, but you can be interrupted midway."],
+      "provider_examples": ["AWS Batch", "Google Cloud Run Jobs", "Scaleway Serverless Jobs"]
+    },
+    {
+      "id": "gpu-accelerators",
+      "family": "compute",
+      "name": "GPUs and accelerators",
+      "aliases": ["GPU", "TPU", "AI accelerators"],
+      "what_it_is": "Specialized cards that perform a huge number of math operations in parallel.",
+      "purpose": "Train or run artificial intelligence models, and process video or graphics at scale.",
+      "units": ["gpu-hour"],
+      "pitfalls": [
+        "It's the most expensive item in the catalog and there is almost never a free tier.",
+        "Availability is a real problem: popular models are often out of stock."
+      ],
+      "provider_examples": ["AWS", "Google Cloud", "Azure", "Vultr", "Scaleway"]
+    },
+    {
+      "id": "object-storage",
+      "family": "storage",
+      "name": "Object storage",
+      "aliases": ["S3", "R2", "Blob Storage", "object storage", "bucket"],
+      "what_it_is": "A repository of files accessible by web address, with no real folders or file system.",
+      "purpose": "Store things that are read a lot and modified little: images, attachments, backups, videos.",
+      "units": ["gb-month", "class-a-operation", "class-b-operation", "gb-egress", "stored-objects"],
+      "pitfalls": [
+        "Storage is cheap; getting the data out is what costs (with exceptions such as Cloudflare R2, which has no egress charge).",
+        "Listing the contents counts as an expensive operation, even if you don't write anything."
+      ],
+      "provider_examples": ["Cloudflare R2", "AWS S3", "Google Cloud Storage", "Backblaze B2", "Oracle Object Storage"]
+    },
+    {
+      "id": "block-storage",
+      "family": "storage",
+      "name": "Block storage (disks)",
+      "aliases": ["EBS", "block volume", "persistent disk"],
+      "what_it_is": "A virtual disk that attaches to a machine and behaves like a physical disk.",
+      "purpose": "Make a machine's data survive its reboot, and give a database fast disk.",
+      "units": ["gb-month", "gib", "iops", "mb-per-second"],
+      "pitfalls": [
+        "You keep paying for the disk even if you shut the machine down.",
+        "It attaches to only one machine at a time; to share, you need file storage."
+      ],
+      "provider_examples": ["AWS EBS", "Google Persistent Disk", "Oracle Block Volume", "Hetzner Volumes"]
+    },
+    {
+      "id": "file-storage",
+      "family": "storage",
+      "name": "Shared file storage",
+      "aliases": ["NFS", "SMB", "EFS", "Filestore"],
+      "what_it_is": "A network folder that several machines can mount and use at the same time.",
+      "purpose": "When several servers need to read and write the same files simultaneously.",
+      "units": ["gb-month", "mb-per-second"],
+      "pitfalls": [
+        "Quite a bit more expensive per GB than object storage.",
+        "Latency makes it a poor candidate for databases."
+      ],
+      "provider_examples": ["AWS EFS", "Google Filestore", "Azure Files"]
+    },
+    {
+      "id": "cold-storage",
+      "family": "storage",
+      "name": "Cold or archive storage",
+      "aliases": ["Glacier", "Archive", "cold storage"],
+      "what_it_is": "Very cheap storage for data that is almost never read and takes time to retrieve.",
+      "purpose": "Keep, out of legal or historical obligation, things you aren't going to look up.",
+      "units": ["gb-month", "min-retention-days", "gb-egress"],
+      "pitfalls": [
+        "There's a minimum retention period: deleting early is billed anyway.",
+        "Retrieval costs money and can take hours.",
+        "It's cheap to fill and expensive to empty."
+      ],
+      "provider_examples": ["AWS S3 Glacier", "Azure Archive", "Google Coldline"]
+    },
+    {
+      "id": "cdn",
+      "family": "storage",
+      "name": "Content delivery network (CDN)",
+      "aliases": ["CDN", "edge cache"],
+      "what_it_is": "A network of servers that keep copies of your files close to each visitor.",
+      "purpose": "Make the web load fast in any country and have your origin server receive far less traffic.",
+      "units": ["gb-egress", "request"],
+      "pitfalls": [
+        "If the content changes, you need to know how to invalidate the cache or stale material gets served.",
+        "Traffic pricing varies by continent."
+      ],
+      "provider_examples": ["Cloudflare", "AWS CloudFront", "Fastly", "Bunny"]
+    },
+    {
+      "id": "backups",
+      "family": "storage",
+      "name": "Managed backups",
+      "aliases": ["backups", "snapshots"],
+      "what_it_is": "A service that makes and keeps automatic copies of your disks or databases.",
+      "purpose": "Be able to roll back after an accidental deletion, an attack, or a failure.",
+      "units": ["gb-month", "min-retention-days"],
+      "pitfalls": [
+        "A backup that has never been restored isn't a backup: it's an assumption.",
+        "Long retention silently multiplies the cost."
+      ],
+      "provider_examples": ["AWS Backup", "Azure Backup", "VPS providers with snapshots"]
+    },
+    {
+      "id": "relational-database",
+      "family": "databases",
+      "name": "Relational database (SQL)",
+      "aliases": ["PostgreSQL", "MySQL", "SQL Server", "RDS", "Aurora"],
+      "what_it_is": "Data organized in tables with relationships between them, queried with the SQL language.",
+      "purpose": "Almost any application with related data: users, orders, transactions, inventories.",
+      "units": ["vcpu-hour", "gb-month", "query", "concurrent-connection", "iops"],
+      "pitfalls": [
+        "Almost no hyperscaler gives it away permanently; Azure is the notable exception.",
+        "The number of simultaneous connections runs out before the CPU does in applications without connection pooling."
+      ],
+      "provider_examples": ["Azure SQL Database", "AWS RDS", "Google Cloud SQL", "Neon", "Supabase"]
+    },
+    {
+      "id": "document-database",
+      "family": "databases",
+      "name": "Document database (NoSQL)",
+      "aliases": ["MongoDB", "Firestore", "DynamoDB", "Cosmos DB"],
+      "what_it_is": "Stores free-form documents instead of rows with fixed columns.",
+      "purpose": "Heterogeneous data or data that changes shape, and simple horizontal scaling.",
+      "units": ["ru-second", "gb-month", "request"],
+      "pitfalls": [
+        "There are no joins between collections: what is one query in SQL is several here.",
+        "Migrating from SQL to a document database forces you to rewrite the entire data layer, not just the queries."
+      ],
+      "provider_examples": ["Google Firestore", "AWS DynamoDB", "Azure Cosmos DB", "MongoDB Atlas"]
+    },
+    {
+      "id": "key-value-cache",
+      "family": "databases",
+      "name": "Key-value store and cache",
+      "aliases": ["Redis", "Memcached", "KV"],
+      "what_it_is": "Stores key-value pairs in memory, with responses in microseconds.",
+      "purpose": "Remember sessions, store expensive results that have already been computed, and limit the rate of requests.",
+      "units": ["gb-month", "request", "concurrent-connection"],
+      "pitfalls": [
+        "If it's memory-only, a restart wipes everything: don't store anything there that you can't recompute."
+      ],
+      "provider_examples": ["Cloudflare KV", "Upstash Redis", "AWS ElastiCache", "Azure Cache for Redis"]
+    },
+    {
+      "id": "analytics-database",
+      "family": "databases",
+      "name": "Analytical store (data warehouse)",
+      "aliases": ["BigQuery", "Redshift", "Snowflake"],
+      "what_it_is": "A database designed to scan enormous volumes of historical data and answer aggregate questions.",
+      "purpose": "Reports, dashboards, and analysis over millions of records.",
+      "units": ["gb-month", "query"],
+      "pitfalls": [
+        "It is usually billed by data scanned: a poorly written query can cost a lot of money in seconds.",
+        "It's a good idea to set spending limits before letting anyone explore."
+      ],
+      "provider_examples": ["Google BigQuery", "AWS Redshift", "Snowflake", "ClickHouse Cloud"]
+    },
+    {
+      "id": "vector-database",
+      "family": "databases",
+      "name": "Vector database",
+      "aliases": ["vector store", "Pinecone", "Vectorize"],
+      "what_it_is": "Stores numeric representations of text or images and finds the ones most similar to each other.",
+      "purpose": "Search by meaning and question-answering systems over your own documents.",
+      "units": ["gb-month", "query"],
+      "pitfalls": [
+        "It's billed by dimensions stored and queried: the size of the embeddings model determines the cost.",
+        "Many cases can be solved with ordinary text search, which is cheaper."
+      ],
+      "provider_examples": ["Cloudflare Vectorize", "Pinecone", "Qdrant Cloud", "pgvector en Postgres"]
+    },
+    {
+      "id": "time-series-database",
+      "family": "databases",
+      "name": "Time-series database",
+      "aliases": ["InfluxDB", "TimescaleDB", "Prometheus"],
+      "what_it_is": "Optimized for data that arrives stamped with the time and is queried by time ranges.",
+      "purpose": "Sensors, system metrics, stock quotes: anything that is measured repeatedly.",
+      "units": ["active-time-series", "gb-month"],
+      "pitfalls": ["Tagging with highly varied values multiplies the number of series and the bill."],
+      "provider_examples": ["InfluxDB Cloud", "Timescale", "Grafana Cloud"]
+    },
+    {
+      "id": "graph-database",
+      "family": "databases",
+      "name": "Graph database",
+      "aliases": ["Neo4j", "Neptune"],
+      "what_it_is": "Stores entities and the relationships between them as first-class citizens.",
+      "purpose": "Social networks, fraud detection, recommendations: questions about paths and connections.",
+      "units": ["vcpu-hour", "gb-month"],
+      "pitfalls": ["Niche: if your questions aren't about chained relationships, SQL is enough and costs less."],
+      "provider_examples": ["Neo4j Aura", "AWS Neptune"]
+    },
+    {
+      "id": "edge-database",
+      "family": "databases",
+      "name": "Distributed or edge SQL database",
+      "aliases": ["D1", "Turso", "libSQL", "managed SQLite"],
+      "what_it_is": "Managed, replicated SQLite, designed to live close to edge compute.",
+      "purpose": "Small or medium applications that want real SQL without administering a database server.",
+      "units": ["row-read", "row-written", "gb-month", "query"],
+      "pitfalls": [
+        "It's billed by rows read, not rows returned: without indexes, a single query can drain the quota.",
+        "Some plans limit queries per invocation, not just per month."
+      ],
+      "provider_examples": ["Cloudflare D1", "Turso"]
+    },
+    {
+      "id": "data-transfer",
+      "family": "networking",
+      "name": "Data transfer (egress)",
+      "aliases": ["bandwidth", "network bandwidth", "egress"],
+      "what_it_is": "The traffic that leaves the provider's infrastructure toward the internet.",
+      "purpose": "It isn't purchased separately: it's the cost that comes along with everything else.",
+      "units": ["gb-egress", "gb-ingress"],
+      "pitfalls": [
+        "It's the most common hidden cost of the cloud.",
+        "The price varies a lot by region: sending data out of South America can cost six times more than out of the United States.",
+        "Ingress is almost always free: it's easy to put data in and expensive to take it out."
+      ],
+      "provider_examples": ["todos"]
+    },
+    {
+      "id": "load-balancer",
+      "family": "networking",
+      "name": "Load balancer",
+      "aliases": ["load balancer", "ALB", "NLB"],
+      "what_it_is": "Spreads visits across several copies of your application and sets aside the ones that don't respond.",
+      "purpose": "Handle more traffic and survive the failure of an instance.",
+      "units": ["vcpu-hour", "lcu", "requests-per-second"],
+      "pitfalls": [
+        "It has a fixed hourly cost that runs even when there's no traffic.",
+        "It often ends up costing more than the small machine it serves."
+      ],
+      "provider_examples": ["AWS ELB", "Google Cloud Load Balancing", "Oracle Load Balancer"]
+    },
+    {
+      "id": "managed-dns",
+      "family": "networking",
+      "name": "Managed DNS",
+      "aliases": ["Route 53", "Cloud DNS", "DNS zone"],
+      "what_it_is": "The service that translates your domain name to the server's address.",
+      "purpose": "So people type your domain and arrive, and so you can move the service elsewhere without anyone noticing.",
+      "units": ["dns-queries-month"],
+      "pitfalls": [
+        "Changes take time to propagate, depending on the configured TTL.",
+        "It's critical infrastructure: if it goes down, everything else looks down."
+      ],
+      "provider_examples": ["Cloudflare DNS", "AWS Route 53", "DigitalOcean DNS"]
+    },
+    {
+      "id": "static-ip",
+      "family": "networking",
+      "name": "Static IP address",
+      "aliases": ["elastic IP", "static IP"],
+      "what_it_is": "A network address that belongs to you and doesn't change when the machine restarts.",
+      "purpose": "When a third party needs to authorize your specific address, or to send email with a good reputation.",
+      "units": ["vcpu-hour"],
+      "pitfalls": [
+        "Several providers charge for the reserved IP precisely when it is NOT in use.",
+        "IPv4 addresses are a scarce resource and getting more expensive."
+      ],
+      "provider_examples": ["AWS", "Google Cloud", "Azure"]
+    },
+    {
+      "id": "private-network",
+      "family": "networking",
+      "name": "Virtual private cloud (VPC)",
+      "aliases": ["VPC", "private network", "subnets"],
+      "what_it_is": "An isolated network where your services talk to each other without going over the internet.",
+      "purpose": "So the database isn't exposed to the world and only your application can reach it.",
+      "units": ["gb-egress"],
+      "pitfalls": [
+        "It's usually free within a region and charged between regions or between zones.",
+        "It's an enormous security gain for almost no cost: you should always use it."
+      ],
+      "provider_examples": ["AWS VPC", "Google VPC", "DigitalOcean VPC"]
+    },
+    {
+      "id": "tls-certificates",
+      "family": "networking",
+      "name": "TLS certificates (HTTPS)",
+      "aliases": ["SSL", "HTTPS", "Let's Encrypt"],
+      "what_it_is": "The document that encrypts the connection and proves your site is who it says it is.",
+      "purpose": "So the padlock appears in the browser and passwords don't travel in the clear.",
+      "units": [],
+      "pitfalls": [
+        "Free and automatic almost everywhere thanks to Let's Encrypt.",
+        "Some free plans do NOT allow a certificate on your own domain, only on the provider's subdomain."
+      ],
+      "provider_examples": ["Let's Encrypt", "Cloudflare", "included with most PaaS"]
+    },
+    {
+      "id": "waf-ddos",
+      "family": "networking",
+      "name": "Web application firewall and DDoS protection",
+      "aliases": ["WAF", "anti-DDoS", "firewall"],
+      "what_it_is": "A filter in front of your application that blocks attacks and malicious traffic.",
+      "purpose": "Survive flooding attacks and stop automated intrusion attempts.",
+      "units": ["request", "requests-per-second"],
+      "pitfalls": [
+        "Poorly tuned rules block legitimate users.",
+        "Basic protection is usually included; advanced protection is paid for separately."
+      ],
+      "provider_examples": ["Cloudflare", "AWS WAF", "Azure Front Door"]
+    },
+    {
+      "id": "zero-trust-access",
+      "family": "networking",
+      "name": "Private access without implicit trust",
+      "aliases": ["zero trust", "Cloudflare Tunnel", "bastion"],
+      "what_it_is": "Publishes an internal service while requiring identity, without opening ports or setting up a traditional VPN.",
+      "purpose": "Give access to an internal dashboard from anywhere without exposing it to the internet.",
+      "units": ["mau"],
+      "pitfalls": ["It's billed per person with access, so it scales with the size of the team."],
+      "provider_examples": ["Cloudflare Zero Trust", "Tailscale", "Google IAP"]
+    },
+    {
+      "id": "api-gateway",
+      "family": "networking",
+      "name": "API gateway",
+      "aliases": ["API Gateway"],
+      "what_it_is": "A single front door in front of your services that authenticates, rate-limits, and routes requests.",
+      "purpose": "Expose a public API with central control over access and usage.",
+      "units": ["request", "requests-per-second"],
+      "pitfalls": ["At high volume it can cost more than the compute it provides access to."],
+      "provider_examples": ["AWS API Gateway", "Azure API Management", "Kong"]
+    },
+    {
+      "id": "transactional-email",
+      "family": "communication",
+      "name": "Transactional email",
+      "aliases": ["SendGrid", "Resend", "SES", "Mailgun"],
+      "what_it_is": "Automatic sending of individual emails triggered by system actions.",
+      "purpose": "Confirmations, password recovery, notices, invoices.",
+      "units": ["email-sent"],
+      "pitfalls": [
+        "Sending is easy; getting into the inbox is not. You have to configure SPF, DKIM, and DMARC.",
+        "VPS providers usually block port 25 to curb spam."
+      ],
+      "provider_examples": ["Resend", "SendGrid", "AWS SES", "Mailgun", "Brevo"]
+    },
+    {
+      "id": "mailboxes",
+      "family": "communication",
+      "name": "Mailboxes",
+      "aliases": ["email hosting", "Google Workspace", "Microsoft 365"],
+      "what_it_is": "Email accounts on your domain that people read and write.",
+      "purpose": "The team's email: hello@yourdomain.com.",
+      "units": ["mau", "gb-month"],
+      "pitfalls": ["It's billed per mailbox per month; aliases are usually free and often enough."],
+      "provider_examples": ["Google Workspace", "Microsoft 365", "Zoho Mail", "Fastmail"]
+    },
+    {
+      "id": "sms-messaging",
+      "family": "communication",
+      "name": "SMS and messaging",
+      "aliases": ["Twilio", "SMS", "WhatsApp Business API"],
+      "what_it_is": "Sending text messages or messaging-app messages from your system.",
+      "purpose": "Verification codes, urgent alerts, reminders.",
+      "units": ["sms-per-destination"],
+      "pitfalls": [
+        "The price varies enormously by country: never estimate with a single rate.",
+        "Many countries require you to register the sender before allowing messages to be sent."
+      ],
+      "provider_examples": ["Twilio", "Vonage", "AWS SNS", "MessageBird"]
+    },
+    {
+      "id": "push-notifications",
+      "family": "communication",
+      "name": "Push notifications",
+      "aliases": ["FCM", "APNs", "push"],
+      "what_it_is": "Alerts that appear on the phone or in the browser even when the application is closed.",
+      "purpose": "Win back someone's attention at no per-message cost.",
+      "units": ["push-notification"],
+      "pitfalls": [
+        "It's usually free or nearly so, but it requires explicit permission and is easily revoked if you abuse it."
+      ],
+      "provider_examples": ["Firebase Cloud Messaging", "OneSignal", "Expo"]
+    },
+    {
+      "id": "voice-telephony",
+      "family": "communication",
+      "name": "Voice and telephony (VoIP)",
+      "aliases": ["Twilio Voice", "SIP"],
+      "what_it_is": "Making and receiving phone calls from software.",
+      "purpose": "Phone switchboards (PBX), call-based alerts, voice verification.",
+      "units": ["voice-minute"],
+      "pitfalls": [
+        "You pay for the number per month in addition to the minutes.",
+        "Quality depends on the user's network, not just the provider."
+      ],
+      "provider_examples": ["Twilio", "Vonage", "Telnyx"]
+    },
+    {
+      "id": "real-time-video",
+      "family": "communication",
+      "name": "Real-time video",
+      "aliases": ["WebRTC", "video calls", "Daily", "LiveKit"],
+      "what_it_is": "Infrastructure for live video and audio calls among several people.",
+      "purpose": "Video calls, virtual classrooms, remote support.",
+      "units": ["participant-minute", "gb-egress"],
+      "pitfalls": [
+        "It's billed per minute and per person: the cost grows quickly with group size.",
+        "Recording and storing are billed separately."
+      ],
+      "provider_examples": ["LiveKit", "Daily", "Twilio Video", "Agora"]
+    },
+    {
+      "id": "real-time-chat",
+      "family": "communication",
+      "name": "Real-time messaging",
+      "aliases": ["WebSocket", "Pusher", "Ably", "realtime"],
+      "what_it_is": "A permanent channel between server and browser for sending changes instantly.",
+      "purpose": "Chats, collaborative boards, live scores, instant notifications.",
+      "units": ["concurrent-connection", "queue-message"],
+      "pitfalls": [
+        "It's billed by simultaneous connections: a hundred people watching costs a hundred connections even if nobody writes."
+      ],
+      "provider_examples": ["Pusher", "Ably", "Cloudflare Durable Objects", "Supabase Realtime"]
+    },
+    {
+      "id": "message-queues",
+      "family": "communication",
+      "name": "Message queues",
+      "aliases": ["SQS", "RabbitMQ", "Queues", "Pub/Sub"],
+      "what_it_is": "A to-do list of pending tasks that one service drops off and another picks up when it can.",
+      "purpose": "Decouple slow processes from the response to the user and absorb work spikes.",
+      "units": ["queue-message"],
+      "pitfalls": [
+        "Putting messages in and taking them out are counted separately.",
+        "You need a dead-letter queue or errors get retried forever."
+      ],
+      "provider_examples": ["AWS SQS", "Google Pub/Sub", "Cloudflare Queues", "Upstash QStash"]
+    },
+    {
+      "id": "event-webhooks",
+      "family": "communication",
+      "name": "Webhooks and event bus",
+      "aliases": ["webhooks", "EventBridge", "events"],
+      "what_it_is": "Automatic notices that one system sends to another when something happens.",
+      "purpose": "So that a confirmed payment triggers an email, or a change in one tool updates another.",
+      "units": ["request"],
+      "pitfalls": [
+        "You have to verify the signature or anyone can fake the notice.",
+        "They get resent: the receiver must tolerate receiving the same thing twice (idempotency)."
+      ],
+      "provider_examples": ["AWS EventBridge", "Svix", "Hookdeck"]
+    },
+    {
+      "id": "managed-authentication",
+      "family": "identity",
+      "name": "Managed authentication",
+      "aliases": ["Auth0", "Clerk", "Cognito", "identity as a service"],
+      "what_it_is": "Delegating sign-up, login, and password management to a third party.",
+      "purpose": "So you don't have to build or maintain the most sensitive system in the application yourself.",
+      "units": ["mau"],
+      "pitfalls": [
+        "The price per active user scales with your success, not with your technical usage.",
+        "Switching providers is hard: the passwords are encrypted in their format.",
+        "For a handful of administrators it can be absurdly expensive compared with a login of your own."
+      ],
+      "provider_examples": ["Clerk", "Auth0", "AWS Cognito", "Supabase Auth", "Firebase Auth"]
+    },
+    {
+      "id": "secrets-management",
+      "family": "identity",
+      "name": "Secrets management",
+      "aliases": ["Secrets Manager", "Vault", "secret variables"],
+      "what_it_is": "An encrypted store for passwords, API keys, and certificates.",
+      "purpose": "So credentials don't live in the code or in the repository.",
+      "units": ["request"],
+      "pitfalls": [
+        "Dedicated services are billed per secret and per retrieval; the platform's environment variables are usually enough and free.",
+        "Changing a secret almost always requires redeploying."
+      ],
+      "provider_examples": ["AWS Secrets Manager", "HashiCorp Vault", "each PaaS’s environment variables"]
+    },
+    {
+      "id": "kms-encryption",
+      "family": "identity",
+      "name": "Encryption key management (KMS)",
+      "aliases": ["KMS", "Key Vault"],
+      "what_it_is": "Safeguards cryptographic keys and performs the encryption without the key ever leaving.",
+      "purpose": "Meet regulatory requirements and protect sensitive data at rest.",
+      "units": ["request"],
+      "pitfalls": [
+        "It's billed per key per month plus per operation: encrypting field by field makes the cost skyrocket."
+      ],
+      "provider_examples": ["AWS KMS", "Azure Key Vault", "Google Cloud KMS"]
+    },
+    {
+      "id": "pki-certificates",
+      "family": "identity",
+      "name": "Internal certificates (PKI)",
+      "aliases": ["private PKI", "mTLS"],
+      "what_it_is": "Issuing your own certificates so your services authenticate each other.",
+      "purpose": "Encrypted and verified communication inside the infrastructure.",
+      "units": [],
+      "pitfalls": [
+        "An expired internal certificate takes down the entire system and usually catches people by surprise."
+      ],
+      "provider_examples": ["AWS Private CA", "Smallstep", "Cloudflare"]
+    },
+    {
+      "id": "audit-compliance",
+      "family": "identity",
+      "name": "Auditing and compliance",
+      "aliases": ["CloudTrail", "audit log"],
+      "what_it_is": "A tamper-proof record of who did what in the infrastructure.",
+      "purpose": "Investigate incidents and meet regulatory requirements.",
+      "units": ["gb-ingested"],
+      "pitfalls": ["The first tier is usually free; keeping a long history is billed."],
+      "provider_examples": ["AWS CloudTrail", "Azure Monitor", "Google Cloud Audit Logs"]
+    },
+    {
+      "id": "code-repository",
+      "family": "operations",
+      "name": "Code repository",
+      "aliases": ["GitHub", "GitLab", "Git"],
+      "what_it_is": "Where the code lives, along with its full change history.",
+      "purpose": "Work as a team, review changes, and be able to go back to any point in the past.",
+      "units": ["gb-month"],
+      "pitfalls": [
+        "Private repositories are almost always free; what gets billed is automation minutes and storage of large files."
+      ],
+      "provider_examples": ["GitHub", "GitLab", "Codeberg", "Bitbucket"]
+    },
+    {
+      "id": "ci-cd",
+      "family": "operations",
+      "name": "Continuous integration and continuous deployment (CI/CD)",
+      "aliases": ["GitHub Actions", "pipelines", "build minutes"],
+      "what_it_is": "Automates testing, building, and publishing every code change.",
+      "purpose": "So that publishing stops being an error-prone manual ritual.",
+      "units": ["vcpu-hour"],
+      "pitfalls": [
+        "It's billed by build minutes, and macOS runners cost up to ten times more than Linux ones.",
+        "Without a dependency cache, every run pays for the entire download."
+      ],
+      "provider_examples": ["GitHub Actions", "GitLab CI", "CircleCI"]
+    },
+    {
+      "id": "container-registry",
+      "family": "operations",
+      "name": "Container registry",
+      "aliases": ["Docker registry", "ECR", "GHCR"],
+      "what_it_is": "The store where container images ready to deploy are kept.",
+      "purpose": "So the deployment platform can download the exact version you want to publish.",
+      "units": ["gb-month", "class-b-operation"],
+      "pitfalls": [
+        "Old images pile up and nobody deletes them: a retention policy is a good idea.",
+        "Pulling from another cloud pays egress."
+      ],
+      "provider_examples": ["GitHub Container Registry", "AWS ECR", "Docker Hub"]
+    },
+    {
+      "id": "logs",
+      "family": "operations",
+      "name": "Logs",
+      "aliases": ["logs", "Datadog", "CloudWatch Logs"],
+      "what_it_is": "The collection and search of everything your application writes down.",
+      "purpose": "Understand what happened when something fails.",
+      "units": ["gb-ingested", "min-retention-days"],
+      "pitfalls": [
+        "You pay twice: for ingesting and for retaining.",
+        "It's the line item that shoots up most without warning; it's better to log less and better."
+      ],
+      "provider_examples": ["Datadog", "AWS CloudWatch", "Grafana Loki", "Axiom"]
+    },
+    {
+      "id": "metrics",
+      "family": "operations",
+      "name": "Metrics",
+      "aliases": ["Prometheus", "monitoring", "dashboards"],
+      "what_it_is": "Numbers measured repeatedly over time: CPU usage, requests per minute, errors.",
+      "purpose": "See trends and get alerts before users complain.",
+      "units": ["active-time-series"],
+      "pitfalls": ["Tagging with unique identifiers causes a cardinality explosion and multiplies the cost."],
+      "provider_examples": ["Grafana Cloud", "Datadog", "Prometheus autogestionado"]
+    },
+    {
+      "id": "traces",
+      "family": "operations",
+      "name": "Distributed traces",
+      "aliases": ["tracing", "OpenTelemetry", "APM"],
+      "what_it_is": "Follows the complete path of a request through all the services it touches.",
+      "purpose": "Find where time is lost in a system with many parts.",
+      "units": ["span"],
+      "pitfalls": [
+        "Sampling is usually applied (keeping only a fraction) because storing everything is extremely expensive."
+      ],
+      "provider_examples": ["Datadog APM", "Honeycomb", "Grafana Tempo"]
+    },
+    {
+      "id": "uptime-monitoring",
+      "family": "operations",
+      "name": "Uptime monitoring",
+      "aliases": ["uptime monitoring", "health checks", "synthetics"],
+      "what_it_is": "An external robot that periodically checks whether your site responds.",
+      "purpose": "Find out about an outage before your users do.",
+      "units": ["synthetic-check"],
+      "pitfalls": [
+        "The interval determines the cost and also how long it takes you to find out.",
+        "Checking from a single region doesn't detect regional problems."
+      ],
+      "provider_examples": ["UptimeRobot", "Better Stack", "Pingdom"]
+    },
+    {
+      "id": "error-tracking",
+      "family": "operations",
+      "name": "Error tracking",
+      "aliases": ["Sentry", "error tracking", "crash reporting"],
+      "what_it_is": "Collects the application's exceptions, groups them, and alerts you.",
+      "purpose": "Know what breaks, how many people it affects, and which version it started with.",
+      "units": ["request"],
+      "pitfalls": ["It's billed per event: an error in a loop can use up the month's quota in an afternoon."],
+      "provider_examples": ["Sentry", "Bugsnag", "Rollbar"]
+    },
+    {
+      "id": "static-hosting",
+      "family": "content",
+      "name": "Static site hosting",
+      "aliases": ["Pages", "Netlify", "static site"],
+      "what_it_is": "Publishing already-generated files (HTML, images) with no program running behind them.",
+      "purpose": "Informational websites, documentation, portfolios, and blogs.",
+      "units": ["gb-egress", "request"],
+      "pitfalls": [
+        "It's the most common free tier in the industry, precisely because it costs very little to serve.",
+        "It doesn't work if you need to store data or authenticate users."
+      ],
+      "provider_examples": ["Cloudflare Pages", "Netlify", "GitHub Pages", "DigitalOcean App Platform"]
+    },
+    {
+      "id": "shared-hosting",
+      "family": "content",
+      "name": "Traditional shared hosting",
+      "aliases": ["cPanel", "web hosting", "LAMP"],
+      "what_it_is": "Space on a shared server with a control panel, designed for websites using PHP and MySQL.",
+      "purpose": "WordPress and sites run by non-technical people.",
+      "units": ["gb-month", "gb-egress"],
+      "pitfalls": [
+        "The “unlimited” promises are limited by the fine print.",
+        "Renewal prices usually double or triple the sign-up price."
+      ],
+      "provider_examples": ["DonWeb", "HostDime", "Hostinger", "SiteGround"]
+    },
+    {
+      "id": "domains",
+      "family": "content",
+      "name": "Domain registration",
+      "aliases": ["domain", "registrar", "DNS name"],
+      "what_it_is": "The annual rental of a name on the internet.",
+      "purpose": "Have your own stable address, independent of where you host.",
+      "units": [],
+      "pitfalls": [
+        "A cheap first year and an expensive renewal is the norm; always compare the renewal price.",
+        "Make sure registration privacy (WHOIS) is included and not billed separately."
+      ],
+      "provider_examples": ["Cloudflare Registrar", "Namecheap", "Porkbun"]
+    },
+    {
+      "id": "managed-search",
+      "family": "content",
+      "name": "Managed search",
+      "aliases": ["Algolia", "Elasticsearch", "Meilisearch"],
+      "what_it_is": "An engine that indexes your content and answers searches with typo tolerance and relevance ranking.",
+      "purpose": "Search for catalogs, documentation, or any large body of content.",
+      "units": ["query", "gb-month"],
+      "pitfalls": [
+        "It's billed per search and per indexed record.",
+        "For small catalogs, PostgreSQL or SQLite full-text search is usually enough."
+      ],
+      "provider_examples": ["Algolia", "Meilisearch Cloud", "Elastic Cloud", "Typesense"]
+    },
+    {
+      "id": "image-processing",
+      "family": "content",
+      "name": "Image and video processing",
+      "aliases": ["Cloudinary", "imgix", "transcoding"],
+      "what_it_is": "Resizes, crops, optimizes, and converts media on demand.",
+      "purpose": "Serve each device the image in the right size and format without generating them by hand.",
+      "units": ["processed-image", "gb-egress"],
+      "pitfalls": [
+        "It's billed per unique transformation: many variants per image multiply the cost.",
+        "Video is billed per encoded minute and is an order of magnitude more expensive."
+      ],
+      "provider_examples": ["Cloudinary", "Cloudflare Images", "imgix", "Mux"]
+    },
+    {
+      "id": "maps-geolocation",
+      "family": "content",
+      "name": "Maps and geolocation",
+      "aliases": ["Google Maps", "Mapbox", "geocoding"],
+      "what_it_is": "Interactive maps, converting addresses to coordinates, and calculating routes.",
+      "purpose": "Show locations, calculate distances, and sequence deliveries.",
+      "units": ["request"],
+      "pitfalls": [
+        "It's billed per map load and per call: a page that reloads the map burns through the quota quickly.",
+        "OpenStreetMap is a free alternative with attribution requirements."
+      ],
+      "provider_examples": ["Google Maps Platform", "Mapbox", "OpenStreetMap"]
+    },
+    {
+      "id": "web-analytics",
+      "family": "content",
+      "name": "Web analytics",
+      "aliases": ["Google Analytics", "Plausible", "statistics"],
+      "what_it_is": "Measures visits, user journeys, and conversions on your site.",
+      "purpose": "Know what works and what doesn't, and where people come from.",
+      "units": ["request", "mau"],
+      "pitfalls": [
+        "Free options are usually paid for with your visitors' data.",
+        "In Europe there are legal implications depending on where the data is processed."
+      ],
+      "provider_examples": ["Plausible", "Umami", "Google Analytics", "Cloudflare Web Analytics"]
+    },
+    {
+      "id": "payment-gateway",
+      "family": "content",
+      "name": "Payment gateway",
+      "aliases": ["Stripe", "PayPal", "MercadoPago", "checkout"],
+      "what_it_is": "Processes card or other payments and transfers the money to you.",
+      "purpose": "Sell or receive contributions without handling card data yourself.",
+      "units": ["transaction-percentage"],
+      "pitfalls": [
+        "The fixed fee makes very small charges unviable: on 1 USD, a third can go to fees.",
+        "Availability by country is a decisive factor; some gateways don't operate throughout Latin America.",
+        "Handling cards on your own means PCI DSS compliance: it almost always makes sense to delegate it."
+      ],
+      "provider_examples": ["Stripe", "MercadoPago", "PayPal", "dLocal"]
+    },
+    {
+      "id": "language-model",
+      "family": "ai",
+      "name": "Language model (LLM)",
+      "aliases": ["GPT", "Claude", "AI API", "chat"],
+      "what_it_is": "A model that receives text and generates text, accessible via API.",
+      "purpose": "Write, summarize, classify, extract data, and hold conversations.",
+      "units": ["input-token", "output-token"],
+      "pitfalls": [
+        "Output costs quite a bit more than input: always separate the two when estimating.",
+        "Resending the entire history on every turn multiplies the cost of a long conversation.",
+        "Context caching can cut the bill a lot if used well."
+      ],
+      "provider_examples": ["Anthropic", "OpenAI", "Google Vertex AI", "Cloudflare Workers AI"]
+    },
+    {
+      "id": "document-ocr",
+      "family": "ai",
+      "name": "OCR and document understanding",
+      "aliases": ["OCR", "Textract", "Document AI", "Document Intelligence"],
+      "what_it_is": "Extracts text—and sometimes structure—from images and PDFs.",
+      "purpose": "Digitize receipts, invoices, and paper forms.",
+      "units": ["ocr-page"],
+      "pitfalls": [
+        "Simple OCR and structured extraction are priced very differently: there can be a tenfold difference.",
+        "Self-hosted Tesseract is free and is usually enough if the images are clean; it's worth measuring accuracy before you pay."
+      ],
+      "provider_examples": [
+        "AWS Textract",
+        "Google Document AI",
+        "Azure Document Intelligence",
+        "Tesseract (autoalojado)"
+      ]
+    },
+    {
+      "id": "speech-to-text",
+      "family": "ai",
+      "name": "Speech-to-text transcription",
+      "aliases": ["speech to text", "Whisper", "STT"],
+      "what_it_is": "Converts spoken audio into written text.",
+      "purpose": "Subtitles, meeting minutes, search within recordings.",
+      "units": ["audio-minute"],
+      "pitfalls": [
+        "Accuracy drops sharply with noise, strong accents, or several people talking at once.",
+        "Speaker identification is usually billed separately."
+      ],
+      "provider_examples": ["OpenAI Whisper", "AssemblyAI", "Google Speech-to-Text", "Deepgram"]
+    },
+    {
+      "id": "text-to-speech",
+      "family": "ai",
+      "name": "Text-to-speech",
+      "aliases": ["text to speech", "TTS"],
+      "what_it_is": "Converts written text into spoken audio.",
+      "purpose": "Accessibility, voice alerts, automatic narration.",
+      "units": ["character"],
+      "pitfalls": [
+        "Neural voices cost several times more than basic ones.",
+        "Cloning a voice has legal and consent implications."
+      ],
+      "provider_examples": ["ElevenLabs", "Google Text-to-Speech", "Azure Speech", "AWS Polly"]
+    },
+    {
+      "id": "translation",
+      "family": "ai",
+      "name": "Machine translation",
+      "aliases": ["DeepL", "Translate"],
+      "what_it_is": "Translates text between languages automatically.",
+      "purpose": "Publish content in several languages without a translation team.",
+      "units": ["character"],
+      "pitfalls": [
+        "It's billed per source character, including spaces and HTML tags if you don't exclude them."
+      ],
+      "provider_examples": ["DeepL", "Google Translate", "Azure Translator"]
+    },
+    {
+      "id": "image-vision",
+      "family": "ai",
+      "name": "Computer vision",
+      "aliases": ["Vision API", "Rekognition", "image classification"],
+      "what_it_is": "Analyzes images to detect objects, text, faces, or inappropriate content.",
+      "purpose": "Moderate user-uploaded content, tag catalogs, read license plates.",
+      "units": ["processed-image"],
+      "pitfalls": ["Facial recognition is regulated or banned in several jurisdictions."],
+      "provider_examples": ["Google Vision AI", "AWS Rekognition", "Azure Computer Vision"]
+    },
+    {
+      "id": "scheduled-tasks",
+      "family": "orchestration",
+      "name": "Scheduled tasks (cron)",
+      "aliases": ["cron", "scheduled jobs", "triggers"],
+      "what_it_is": "Runs something automatically at a fixed time or interval.",
+      "purpose": "Daily reports, periodic cleanups, reminders, syncs.",
+      "units": ["invocation"],
+      "pitfalls": [
+        "Almost always in UTC: local times and clock changes cause surprises.",
+        "If one run overlaps the previous one, it can duplicate work."
+      ],
+      "provider_examples": ["Cloudflare Cron Triggers", "GitHub Actions schedule", "Google Cloud Scheduler"]
+    },
+    {
+      "id": "workflows",
+      "family": "orchestration",
+      "name": "Workflows",
+      "aliases": ["Step Functions", "orchestration", "durable execution"],
+      "what_it_is": "Coordinates several steps with waits, retries, and state that survives failures.",
+      "purpose": "Long processes with several stages that can't be lost halfway through.",
+      "units": ["invocation"],
+      "pitfalls": ["It's billed per state transition: a workflow with many small steps gets expensive."],
+      "provider_examples": ["AWS Step Functions", "Temporal", "Cloudflare Workflows", "Inngest"]
+    },
+    {
+      "id": "etl",
+      "family": "orchestration",
+      "name": "Data pipelines (ETL)",
+      "aliases": ["ETL", "Airflow", "data pipelines"],
+      "what_it_is": "Moves data between systems, transforming it along the way.",
+      "purpose": "Feed an analytics warehouse from production databases.",
+      "units": ["vcpu-hour", "gb-month"],
+      "pitfalls": [
+        "Managed tools charge per connector and per synced row: the cost grows with the volume of data, not with its value."
+      ],
+      "provider_examples": ["Airbyte", "Fivetran", "AWS Glue", "Apache Airflow autogestionado"]
+    }
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "description": "Ofertas concretas de proveedores. CAPA VOLÁTIL: caduca rápido. Toda fila lleva fecha de verificación y fuente. Reverificar antes de decidir.",
+  "warning": "Oracle recortó su cuota gratuita a la mitad en agosto de 2026 sin anuncio público. Trata cualquier fila con más de 90 días como sospechosa.",
+  "pricing_models": {
+    "perpetual-free": {
+      "name": "Perpetuo gratuito",
+      "explanation": "Gratis sin fecha de fin, dentro de unos límites. El proveedor puede cambiarlo, y lo hace."
+    },
+    "monthly-renewable-quota": {
+      "name": "Cuota mensual que se repone",
+      "explanation": "Cada mes vuelves a tener la misma cantidad gratis. No se acumula lo no usado."
+    },
+    "daily-renewable-quota": { "name": "Cuota diaria que se repone", "explanation": "Se reinicia cada día, normalmente a medianoche UTC." },
+    "one-time-credit": { "name": "Crédito único que se agota", "explanation": "Una cantidad de dinero regalada para gastar. Cuando se acaba, se acaba." },
+    "time-limited-free": { "name": "Gratis por tiempo limitado", "explanation": "Gratis durante N meses y después se cobra o se cierra." },
+    "time-subscription": { "name": "Suscripción por tiempo", "explanation": "Precio fijo al mes o al año, uses lo que uses." },
+    "metered-usage": { "name": "Uso medido", "explanation": "Pagas exactamente lo consumido, sin mínimo." },
+    "base-plus-overage": { "name": "Base fija más excedente", "explanation": "Una cuota fija que incluye cierto consumo, y tarifa por lo que pases." },
+    "per-transaction": { "name": "Por transacción", "explanation": "Una comisión sobre cada operación, normalmente porcentaje más fijo." }
+  },
+  "offers": {
+    "cloudflare-workers-free": {
+      "service": "Workers (plan gratuito)",
+      "price": "0 USD",
+      "overage_price": "Error 1027 al superar las peticiones diarias. Para más CPU hay que pasar a Workers Paid (5 USD/mes).",
+      "notes": "Los 10 ms son un TOPE POR PETICIÓN, no una bolsa: una sola operación pesada falla siempre. Único de esta lista que no pide tarjeta."
+    },
+    "cloudflare-workers-paid": {
+      "service": "Workers Paid",
+      "price": "5 USD/mes",
+      "notes": "Sube el tope de CPU de 10 ms a 30 s por defecto, ampliable a 5 minutos. Es la vía para conservar un hash de contraseña fuerte."
+    },
+    "cloudflare-d1-free": {
+      "service": "D1 (plan gratuito)",
+      "price": "0 USD",
+      "notes": "Hasta 10 bases de datos. SQL real (SQLite) con transacciones por lotes.",
+      "include_notes": ["por base de datos", "total de la cuenta", "por invocación del Worker"]
+    },
+    "azure-container-apps-free": {
+      "service": "Container Apps (concesión mensual gratuita)",
+      "price": "0 USD dentro de la concesión",
+      "notes": "Sin tope de CPU por petición. Escala a cero, con arranques en frío. Se combina bien con Azure SQL gratuito."
+    },
+    "azure-sql-free": {
+      "service": "Azure SQL Database (oferta gratuita)",
+      "price": "0 USD",
+      "notes": "EL DATO MÁS VALIOSO DE ESTA TABLA: es gratis durante toda la vida de la suscripción, no 12 meses, y vale para cualquier tipo de suscripción. Ni AWS ni Google tienen equivalente. Hasta 10 bases. Al agotar la cuota se pausa hasta el mes siguiente, o se paga el excedente si lo eliges.",
+      "include_notes": ["100 000 vCore-segundos", "datos, por base", "copias de seguridad, por base"]
+    },
+    "azure-app-service-f1": {
+      "service": "App Service plan F1",
+      "price": "0 USD",
+      "notes": "1 GB de RAM. SIN certificado TLS en dominio propio y sin SLA; Microsoft indica que no está soportado para producción.",
+      "include_notes": [null, "almacenamiento"]
+    },
+    "gcp-cloud-run-free": {
+      "service": "Cloud Run (Always Free)",
+      "price": "0 USD dentro de la cuota",
+      "notes": "Sin tope de CPU por petición. Requiere cuenta de facturación aunque no se pague nada.",
+      "include_notes": [null, null, null, "desde Norteamérica"]
+    },
+    "gcp-e2-micro-free": {
+      "service": "Compute Engine e2-micro (Always Free)",
+      "price": "0 USD",
+      "notes": "La única VM permanentemente gratuita de un hiperescalador, siempre encendida y sin arranques en frío. Solo en us-west1, us-central1 y us-east1. 1 GB de RAM. El límite real es el egreso de 1 GB al mes.",
+      "include_notes": ["1 instancia encendida todo el mes", "disco persistente estándar", "desde Norteamérica"]
+    },
+    "gcp-firestore-free": {
+      "service": "Firestore (Always Free)",
+      "price": "0 USD",
+      "notes": "Es NoSQL documental: migrar aquí desde SQL obliga a reescribir la capa de datos entera, no solo las consultas.",
+      "include_notes": ["GiB por proyecto", null, null]
+    },
+    "gcp-trial": {
+      "service": "Crédito de bienvenida",
+      "price": "300 USD de crédito para 90 días",
+      "notes": "No hay ninguna base SQL siempre gratuita en Google Cloud: Cloud SQL solo tiene prueba de 30 días."
+    },
+    "aws-lambda-free": {
+      "service": "Lambda (Always Free)",
+      "price": "0 USD",
+      "notes": "Indefinido, no caduca. Límite duro de 6 MB en el cuerpo de una invocación síncrona, que descarta subidas de archivos grandes."
+    },
+    "aws-free-plan-account": {
+      "service": "Plan gratuito para cuentas nuevas",
+      "price": "100 USD de crédito al registrarse, hasta 100 USD más por completar actividades",
+      "notes": "ATENCIÓN: desde julio de 2025 la cuenta SE CIERRA a los 6 meses o al agotar el crédito. Las cuentas creadas antes de esa fecha conservan el esquema antiguo de 12 meses. Para permanencia hay que pasar al plan de pago.",
+      "expires": "6 meses desde el alta"
+    },
+    "aws-ec2-t4g-trial": {
+      "service": "EC2 t4g.small (prueba gratuita)",
+      "price": "0 USD hasta el 31 de diciembre de 2026",
+      "notes": "Para clientes nuevos y existentes. 750 horas cubren una instancia encendida todo el mes. No incluye el disco. Al terminar el programa pasa a tarifa normal.",
+      "include_notes": ["agregado entre todas las regiones"]
+    },
+    "aws-ec2-micro-12-months": {
+      "service": "EC2 t2.micro / t3.micro (nivel gratuito de 12 meses, heredado)",
+      "price": "0 USD dentro de la cuota; fuera de ella se factura a tarifa normal",
+      "notes": "Programa heredado: ya no se concede. Como el plazo es de 12 meses desde el alta y la última alta posible fue el 14-jul-2025, deduzco que ha expirado para todas las cuentas hacia el 14-jul-2026 (inferencia, no lo dice AWS). Las cuentas nuevas (desde el 15-jul-2025) no tienen cuota de horas sino crédito: ver aws-free-plan-account. En ellas la consola marca como elegibles t3.micro, t3.small, t4g.micro, t4g.small, c7i-flex.large y m7i-flex.large, pero consumen crédito y no pueden pasarse del límite. t4g.micro no existe en el programa heredado. Las 750 h/mes cubren una instancia encendida todo el mes (un mes de 31 días son 744 h).",
+      "expires": "12 meses desde el alta; solo cuentas creadas antes del 15 de julio de 2025",
+      "include_notes": [
+        "horas de instancia t2.micro, Linux y Windows contadas por separado; agregado entre regiones. Donde no hay t2.micro (p. ej. Estocolmo, Baréin) vale t3.micro",
+        "EBS (standard, st1, sc1, gp2, gp3); cifra del programa histórico, no reconfirmada en la documentación actual"
+      ]
+    },
+    "oracle-always-free-arm": {
+      "service": "Always Free — Ampere A1 (ARM)",
+      "price": "0 USD",
+      "notes": "RECORTADO A LA MITAD en agosto de 2026: eran 3 000 OCPU-horas y 18 000 GB-horas (4 OCPU / 24 GB) y pasaron a 1 500 y 9 000 (2 OCPU / 12 GB). Vigente desde el 15 de junio, aplicado el 18 de agosto, sin anuncio público. Exige tarjeta de crédito real: no acepta virtuales ni prepagas. Las instancias inactivas pueden reclamarse.",
+      "include_notes": [
+        "= 2 OCPU encendidas de forma continua",
+        "almacenamiento de bloques, total",
+        "almacenamiento de objetos"
+      ]
+    },
+    "oracle-autonomous-db-free": {
+      "service": "Always Free — Autonomous Database",
+      "price": "0 USD",
+      "notes": "SQL real y gestionado, permanente. Segunda base SQL siempre gratuita del mercado junto a Azure. Ni el CPU ni el almacenamiento son ampliables en este nivel.",
+      "include_notes": ["por instancia, 2 instancias", null]
+    },
+    "digitalocean-app-platform-free": {
+      "service": "App Platform (nivel gratuito)",
+      "price": "0 USD",
+      "notes": "SOLO sitios estáticos. No admite aplicaciones con servidor: para eso el mínimo es 5 USD/mes.",
+      "include_notes": ["GiB por aplicación, 3 aplicaciones"]
+    },
+    "digitalocean-functions": {
+      "service": "Functions",
+      "price": "0 USD hasta 90 000 GiB-segundos al mes",
+      "overage_price": "0,0000185 USD por GiB-segundo (un millón extra cuesta 18,50 USD)",
+      "notes": "No cobra las invocaciones por separado: todo se factura como GiB-segundos, según la fórmula invocaciones × RAM en GiB × segundos de ejecución. OJO CON EL REDONDEO: la duración mínima facturable es de 100 ms por invocación, así que una función que responde en 5 ms se cobra como si tardara 100, veinte veces más. Para hacerse una idea de la cuota: 90 000 GiB-s dan 720 000 invocaciones de una función de 128 MiB que tarde un segundo, o 180 000 si la función usa 512 MiB. Es el nivel gratuito más pequeño de los cuatro servicios sin servidor de esta base: AWS Lambda y Scaleway dan 400 000 GB-s, equivalentes a 372 529 GiB-s, es decir 4,1 veces más. La cuota no se acumula de un mes al siguiente.",
+      "include_notes": ["por cuenta, no por función"]
+    },
+    "digitalocean-app-platform-basic": {
+      "service": "App Platform — servicio web básico",
+      "price": "5 USD/mes (1 CPU compartida, 512 MiB de RAM)",
+      "notes": "Base de datos de desarrollo aparte: 7 USD/mes por 512 MB.",
+      "include_notes": ["GiB incluidos"]
+    },
+    "render-web-free": {
+      "service": "Servicio web gratuito",
+      "price": "0 USD",
+      "notes": "Se suspende tras 15 minutos sin tráfico y tarda cerca de un minuto en volver. Render muestra una página de carga mientras despierta."
+    },
+    "render-postgres-free": {
+      "service": "PostgreSQL gratuito",
+      "price": "0 USD durante 30 días",
+      "notes": "TRAMPA IMPORTANTE: la base CADUCA a los 30 días de crearla, con 14 días de gracia para pagar antes del borrado. Inservible para datos que deban permanecer.",
+      "expires": "30 días desde su creación"
+    },
+    "koyeb-free": {
+      "service": "Instancia gratuita",
+      "price": "0 USD",
+      "notes": "Un servicio web con 512 MB de RAM y 0,1 vCPU, en Fráncfort o Washington DC. SÍ exige tarjeta: retienen 29 USD para verificarla. Su PostgreSQL gratuito solo cubre 5 horas activas al mes, así que no sirve como base persistente.",
+      "include_notes": ["SSD"]
+    },
+    "scaleway-serverless-containers-free": {
+      "service": "Serverless Containers (nivel gratuito)",
+      "price": "0 USD dentro de la cuota",
+      "notes": "Sus funciones sin servidor añaden 1 millón de peticiones y 400 000 GB-segundos al mes."
+    },
+    "ibm-code-engine-free": {
+      "service": "Code Engine (nivel gratuito)",
+      "price": "0 USD dentro de la cuota",
+      "notes": "Se renueva cada mes y no expira. Sin base de datos gratuita asociada."
+    },
+    "replit-starter": {
+      "service": "Plan Starter",
+      "price": "0 USD",
+      "notes": "Permite 1 proyecto publicado, base de datos incluida y una tarea en segundo plano, con 'uso diario gratuito' cuyas cifras no publican. Fuentes secundarias indican suspensión a los 5 minutos, 512 MB de RAM y sin dominio propio. El plan Core cuesta 17 USD/mes anual o 20 USD mensual."
+    },
+    "fly-io-shared-cpu": {
+      "service": "Machines de CPU compartida",
+      "price": "de 1,94 a 85,59 USD/mes; de 0,0027 a 0,1189 USD/hora (precios de Ámsterdam)",
+      "notes": "ÚNICA de las seis líneas cuyo precio VARÍA POR REGIÓN: las cifras aquí son las de Ámsterdam y no valen para otras zonas. Es también la única que factura POR SEGUNDO, así que su precio mensual es una equivalencia a 30 días, no un tope: las horas implícitas rondan 720 frente a las 613-714 de los demás, o sea que no hay descuento por dejar la máquina encendida. El precio se descompone limpiamente en dos partes aditivas: una base de CPU que se duplica en cada escalón (0,69 / 1,39 / 2,78 / 5,54 USD al mes) más 5,00 USD por cada GB de RAM, uniforme en los cuatro tamaños. Ningún preset incluye disco: los volúmenes se cobran aparte. Eliminó su nivel gratuito para cuentas nuevas en octubre de 2024. Tiene regiones reales en Latinoamérica (Bogotá, São Paulo, Santiago, Querétaro), pero sus pagos por Stripe rechazan una fracción alta de tarjetas venezolanas.",
+      "pricing_region": "ams (Ámsterdam)"
+    },
+    "railway-trial": {
+      "service": "Prueba gratuita",
+      "price": "5 USD de crédito por 30 días; después mínimo 1 USD/mes; plan Hobby 5 USD/mes",
+      "notes": "Retiró su nivel gratuito real en julio de 2023.",
+      "expires": "30 días"
+    },
+    "turso-free": {
+      "service": "Nivel gratuito",
+      "price": "0 USD",
+      "notes": "SQLite gestionado, el reemplazo más parecido a D1 si hay que salir de Cloudflare. LAS FUENTES DISCREPAN en las cifras exactas (entre 5 y 9 GB): confirmar en su página antes de decidir."
+    },
+    "hetzner-cost-optimized": {
+      "service": "Cost-Optimized (línea CX)",
+      "price": "de 6,49 a 18,49 USD/mes; de 0,010 a 0,030 USD/hora",
+      "notes": "vCPU compartida Intel/AMD. Es la relación precio/RAM más baja de las cinco líneas comparadas: de 1,62 USD por GB de RAM al mes en el escalón de entrada (CX23) a 1,16 en el mayor (CX43). Las otras cuatro líneas no bajan de 5,00. La tabla no publica transferencia incluida. Acepta PayPal y SEPA."
+    },
+    "hetzner-regular-performance": {
+      "service": "Regular Performance (línea CPX)",
+      "price": "de 13,49 a 81,99 USD/mes; de 0,022 a 0,131 USD/hora",
+      "notes": "vCPU compartida AMD, con más disco por plan que la línea CX pero a un precio por GB de RAM cuatro veces mayor: de 6,75 USD en el escalón de entrada (CPX12) a 5,12 en el mayor (CPX42), frente al rango de 1,62 a 1,16 de la CX. El CPX12 es plan nuevo. La tabla no publica transferencia incluida."
+    },
+    "digitalocean-basic-droplets": {
+      "service": "Basic Droplets",
+      "price": "de 4,00 a 96,00 USD/mes; de 0,00595 a 0,14286 USD/hora",
+      "notes": "ÚNICA de las cinco líneas comparadas que usa UNIDADES BINARIAS (MiB/GiB): sus 16 GiB son un 7,4 % más que los 16 GB de las demás, así que compararlas sin convertir arrastra ese error. Su tabla tampoco publica nombre de plan: los planes se identifican solo por recursos. Es también la más consistente en tarifa horaria, con el mes equivalente a 672 horas exactas en todos los escalones."
+    },
+    "vultr-vps": {
+      "service": "Cloud Compute (línea vc2)",
+      "price": "de 2,50 a 80,00 USD/mes; de 0,004 a 0,119 USD/hora",
+      "notes": "El escalón de entrada más barato de las cinco líneas comparadas (2,50 USD/mes). Acepta pago directo en criptomonedas, lo que evita el problema de las tarjetas rechazadas. Regiones en Miami, Ciudad de México, São Paulo y Santiago."
+    },
+    "linode-shared-cpu": {
+      "service": "Shared CPU (Nanode y Linode)",
+      "price": "de 5,00 a 384,00 USD/mes; de 0,0075 a 0,5760 USD/hora",
+      "notes": "La única de las cinco líneas que publica el ancho de banda de red por plan (40 Gbps de entrada; de 1 a 9 Gbps de salida). El Nanode sale a 5,00 USD por GB de RAM al mes y todos los demás escalones a 6,00: conviene no leer el precio de entrada como representativo de la línea. Es también la que escala más arriba, hasta 64 GB de RAM."
+    },
+    "ovhcloud-vps": {
+      "service": "VPS",
+      "price": "de 4,54 a 23,37 USD/mes. NO publica tarifa horaria: la línea se contrata por meses.",
+      "notes": "EL MEJOR PRECIO POR GB DE RAM DE TODAS LAS LÍNEAS COMPARADAS: de 1,13 USD al mes en el VPS-1 a 0,97 en el VPS-4, por debajo incluso del 1,16 del mejor escalón de la línea CX de Hetzner. Sus cuatro planes baten al mejor de Hetzner. Es también la única que anuncia TRÁFICO ILIMITADO —el límite real pasa a ser el ancho de banda del enlace, de 500 Mbps a 3 Gbps— y la única que incluye copia de seguridad diaria de las últimas 24 horas. Dos advertencias que compensan lo anterior: los precios se anuncian como «starting at», o sea que son de captación y la renovación suele ser más cara, y OVHcloud anunció subidas escalonadas del 9-11 % entre 2026 y 2028 por el coste de la memoria. Al no haber tarifa horaria, tampoco hay forma de pagar solo por el rato que la uses."
+    }
+  }
+}

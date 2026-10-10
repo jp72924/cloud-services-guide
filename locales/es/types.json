@@ -1,0 +1,688 @@
+{
+  "description": "Catálogo de tipos de servicio de internet y nube. Capa estable: responde qué es cada cosa, para qué sirve y en qué unidades se mide. No contiene precios ni proveedores concretos: eso vive en ofertas.json.",
+  "families": {
+    "compute": { "name": "Cómputo", "summary": "Dónde se ejecuta tu código." },
+    "storage": { "name": "Almacenamiento", "summary": "Dónde viven tus archivos." },
+    "databases": { "name": "Bases de datos", "summary": "Dónde viven tus datos con estructura." },
+    "networking": { "name": "Red y entrega", "summary": "Cómo llega tu servicio a quien lo usa." },
+    "communication": { "name": "Comunicación", "summary": "Cómo tu sistema habla con las personas." },
+    "identity": { "name": "Identidad y seguridad", "summary": "Quién entra y qué puede hacer." },
+    "operations": { "name": "Desarrollo y operación", "summary": "Cómo construyes, publicas y vigilas." },
+    "content": { "name": "Contenido y aplicación", "summary": "Piezas de producto ya resueltas." },
+    "ai": { "name": "Inteligencia artificial", "summary": "Servicios que interpretan o generan contenido." },
+    "orchestration": { "name": "Orquestación de trabajos", "summary": "Qué se ejecuta, cuándo y en qué orden." }
+  },
+  "types": {
+    "virtual-machine": {
+      "name": "Máquina virtual (VM, IaaS)",
+      "aliases": ["VPS", "droplet", "instancia", "EC2", "Compute Engine"],
+      "what_it_is": "Un ordenador completo que alquilas por horas, con su sistema operativo, y del que tienes control total.",
+      "purpose": "Ejecutar cualquier cosa sin restricciones de plataforma, cuando necesitas mandar tú sobre el entorno o el proveedor no ofrece algo más cómodo.",
+      "pitfalls": [
+        "Pagas por tenerla encendida aunque nadie la use.",
+        "La administración es tuya: parches de seguridad, certificados, reinicios."
+      ]
+    },
+    "dedicated-server": {
+      "name": "Servidor dedicado (bare metal)",
+      "aliases": ["metal desnudo", "servidor físico"],
+      "what_it_is": "Una máquina física entera para ti, sin compartir el procesador con otros clientes.",
+      "purpose": "Cargas constantes y pesadas, o cuando el rendimiento no puede depender de lo que hagan los vecinos.",
+      "pitfalls": [
+        "Se contrata por meses, no por horas: no sirve para picos puntuales.",
+        "Sin vecinos, pero también sin migración automática si el hardware falla."
+      ]
+    },
+    "managed-containers": {
+      "name": "Contenedores gestionados (CaaS)",
+      "aliases": ["Cloud Run", "Container Apps", "App Runner", "serverless containers"],
+      "what_it_is": "Entregas una imagen de contenedor y el proveedor la ejecuta, la escala y la apaga sin que administres servidores.",
+      "purpose": "Publicar una aplicación con un Dockerfile y olvidarte de la máquina, pagando por uso real.",
+      "pitfalls": [
+        "Con escala a cero, la primera visita tras un rato de calma espera el arranque en frío.",
+        "Las cuotas gratuitas suelen ser por cuenta, no por servicio."
+      ]
+    },
+    "serverless-functions": {
+      "name": "Funciones sin servidor (FaaS)",
+      "aliases": ["Lambda", "Functions", "funciones"],
+      "what_it_is": "Subes una función suelta y se ejecuta cuando algo la dispara, sin que exista un servidor tuyo esperando.",
+      "purpose": "Tareas cortas y esporádicas: responder a un webhook, procesar una subida, ejecutar algo cada hora.",
+      "pitfalls": [
+        "Hay límites duros de duración y de tamaño de la petición (AWS Lambda corta en 6 MB por invocación síncrona).",
+        "Mantener estado entre llamadas no es fiable: cada ejecución puede ser una máquina distinta.",
+        "Cuidado con el redondeo mínimo por invocación: DigitalOcean factura un mínimo de 100 ms, así que una función que responde en 5 ms se cobra veinte veces su coste real. Conviene mirarlo antes de trocear la lógica en muchas funciones diminutas."
+      ]
+    },
+    "edge-compute": {
+      "name": "Cómputo en el borde (edge)",
+      "aliases": ["Workers", "edge functions", "cómputo distribuido"],
+      "what_it_is": "Tu código se ejecuta en cientos de ciudades a la vez, en el punto de red más cercano a cada visitante.",
+      "purpose": "Respuestas muy rápidas en todo el mundo sin elegir región, y para trabajo ligero delante de un sistema más pesado.",
+      "pitfalls": [
+        "El límite suele ser un TOPE POR PETICIÓN de milisegundos de CPU, no una bolsa mensual: una operación cara falla siempre.",
+        "No es Node.js completo: hay APIs del sistema que no existen."
+      ]
+    },
+    "application-platform": {
+      "name": "Plataforma de aplicaciones (PaaS)",
+      "aliases": ["App Platform", "App Service", "Heroku-like"],
+      "what_it_is": "Conectas un repositorio y la plataforma construye, despliega y sirve la aplicación por ti.",
+      "purpose": "Publicar rápido sin tocar infraestructura, con despliegue automático en cada cambio de código.",
+      "pitfalls": [
+        "Los planes gratuitos suelen suspender la aplicación por inactividad y tardar cerca de un minuto en despertarla.",
+        "Algunos planes gratuitos no permiten certificado propio en tu dominio."
+      ]
+    },
+    "managed-kubernetes": {
+      "name": "Kubernetes gestionado",
+      "aliases": ["EKS", "GKE", "AKS", "OKE", "k8s"],
+      "what_it_is": "El proveedor mantiene el cerebro del clúster y tú aportas las máquinas donde corren tus contenedores.",
+      "purpose": "Coordinar muchos servicios que se despliegan y escalan de forma independiente.",
+      "pitfalls": [
+        "El plano de control a veces se cobra aparte, a veces es gratis: cambia por proveedor.",
+        "Es la opción con más complejidad operativa del catálogo; rara vez se justifica por debajo de una decena de servicios."
+      ]
+    },
+    "batch-jobs": {
+      "name": "Trabajos por lotes (batch)",
+      "aliases": ["batch jobs", "jobs"],
+      "what_it_is": "Ejecuciones que arrancan, procesan un volumen de trabajo y terminan, sin atender peticiones.",
+      "purpose": "Procesar archivos, generar informes, migrar datos: cosas largas que nadie está esperando en pantalla.",
+      "pitfalls": ["Si usas capacidad sobrante (spot) es mucho más barato, pero te pueden interrumpir a mitad."]
+    },
+    "gpu-accelerators": {
+      "name": "GPU y aceleradores",
+      "aliases": ["GPU", "TPU", "aceleradores de IA"],
+      "what_it_is": "Tarjetas especializadas en hacer muchísimas operaciones matemáticas en paralelo.",
+      "purpose": "Entrenar o ejecutar modelos de inteligencia artificial, y procesar vídeo o gráficos a gran escala.",
+      "pitfalls": [
+        "Es lo más caro del catálogo y casi nunca hay nivel gratuito.",
+        "La disponibilidad es un problema real: los modelos populares suelen estar agotados."
+      ]
+    },
+    "object-storage": {
+      "name": "Almacenamiento de objetos",
+      "aliases": ["S3", "R2", "Blob Storage", "object storage", "bucket"],
+      "what_it_is": "Un depósito de archivos accesibles por dirección web, sin carpetas reales ni sistema de ficheros.",
+      "purpose": "Guardar cosas que se leen mucho y se modifican poco: imágenes, adjuntos, copias, vídeos.",
+      "pitfalls": [
+        "El almacenamiento es barato; sacar los datos es lo que cuesta (salvo excepciones como Cloudflare R2, sin cargo de egreso).",
+        "Listar el contenido cuenta como operación cara, aunque no escribas nada."
+      ]
+    },
+    "block-storage": {
+      "name": "Almacenamiento de bloques (discos)",
+      "aliases": ["EBS", "block volume", "disco persistente"],
+      "what_it_is": "Un disco virtual que se conecta a una máquina y se comporta como un disco físico.",
+      "purpose": "Que los datos de una máquina sobrevivan a su reinicio, y dar disco rápido a una base de datos.",
+      "pitfalls": [
+        "Sigues pagando el disco aunque apagues la máquina.",
+        "Solo se conecta a una máquina a la vez; para compartir hace falta almacenamiento de archivos."
+      ]
+    },
+    "file-storage": {
+      "name": "Almacenamiento de archivos compartido",
+      "aliases": ["NFS", "SMB", "EFS", "Filestore"],
+      "what_it_is": "Una carpeta en red que varias máquinas pueden montar y usar a la vez.",
+      "purpose": "Cuando varios servidores necesitan leer y escribir los mismos archivos simultáneamente.",
+      "pitfalls": [
+        "Bastante más caro por GB que el almacenamiento de objetos.",
+        "La latencia lo hace mal candidato para bases de datos."
+      ]
+    },
+    "cold-storage": {
+      "name": "Almacenamiento frío o de archivo",
+      "aliases": ["Glacier", "Archive", "cold storage"],
+      "what_it_is": "Almacenamiento muy barato para datos que casi nunca se leen y que tardan en recuperarse.",
+      "purpose": "Conservar por obligación legal o histórica cosas que no vas a consultar.",
+      "pitfalls": [
+        "Hay permanencia mínima: borrar antes de tiempo se cobra igual.",
+        "Recuperar cuesta dinero y puede tardar horas.",
+        "Es barato de llenar y caro de vaciar."
+      ]
+    },
+    "cdn": {
+      "name": "Red de distribución de contenido (CDN)",
+      "aliases": ["CDN", "caché de borde"],
+      "what_it_is": "Una red de servidores que guardan copias de tus archivos cerca de cada visitante.",
+      "purpose": "Que la web cargue rápido en cualquier país y que tu servidor de origen reciba mucho menos tráfico.",
+      "pitfalls": [
+        "Si el contenido cambia, hay que saber invalidar la caché o se sirve material viejo.",
+        "El precio del tráfico varía por continente."
+      ]
+    },
+    "backups": {
+      "name": "Copias de seguridad gestionadas",
+      "aliases": ["backups", "snapshots"],
+      "what_it_is": "Un servicio que hace y conserva copias automáticas de tus discos o bases de datos.",
+      "purpose": "Poder volver atrás tras un borrado accidental, un ataque o un fallo.",
+      "pitfalls": [
+        "Una copia que nunca se ha restaurado no es una copia: es una suposición.",
+        "La retención larga multiplica el coste silenciosamente."
+      ],
+      "provider_examples": ["AWS Backup", "Azure Backup", "proveedores de VPS con snapshots"]
+    },
+    "relational-database": {
+      "name": "Base de datos relacional (SQL)",
+      "aliases": ["PostgreSQL", "MySQL", "SQL Server", "RDS", "Aurora"],
+      "what_it_is": "Datos organizados en tablas con relaciones entre ellas, consultados con el lenguaje SQL.",
+      "purpose": "Casi cualquier aplicación con datos que se relacionan: usuarios, pedidos, movimientos, inventarios.",
+      "pitfalls": [
+        "Casi ningún hiperescalador la regala de forma permanente; Azure es la excepción notable.",
+        "El número de conexiones simultáneas se agota antes que la CPU en aplicaciones sin agrupación de conexiones."
+      ]
+    },
+    "document-database": {
+      "name": "Base de datos documental (NoSQL)",
+      "aliases": ["MongoDB", "Firestore", "DynamoDB", "Cosmos DB"],
+      "what_it_is": "Guarda documentos con forma libre, en vez de filas con columnas fijas.",
+      "purpose": "Datos heterogéneos o que cambian de forma, y escalado horizontal sencillo.",
+      "pitfalls": [
+        "No hay uniones entre colecciones: lo que en SQL es una consulta, aquí son varias.",
+        "Migrar de SQL a documental obliga a reescribir toda la capa de datos, no solo las consultas."
+      ]
+    },
+    "key-value-cache": {
+      "name": "Almacén clave-valor y caché",
+      "aliases": ["Redis", "Memcached", "KV"],
+      "what_it_is": "Guarda pares de clave y valor en memoria, con respuestas de microsegundos.",
+      "purpose": "Recordar sesiones, guardar resultados costosos ya calculados y limitar la frecuencia de peticiones.",
+      "pitfalls": [
+        "Si es solo memoria, un reinicio lo borra todo: no guardes ahí nada que no puedas recalcular."
+      ]
+    },
+    "analytics-database": {
+      "name": "Almacén analítico (data warehouse)",
+      "aliases": ["BigQuery", "Redshift", "Snowflake"],
+      "what_it_is": "Base pensada para recorrer volúmenes enormes de datos históricos y responder preguntas agregadas.",
+      "purpose": "Informes, paneles y análisis sobre millones de registros.",
+      "pitfalls": [
+        "Suele cobrarse por datos escaneados: una consulta mal escrita puede costar mucho dinero en segundos.",
+        "Conviene poner límites de gasto antes de dejar que alguien explore."
+      ]
+    },
+    "vector-database": {
+      "name": "Base de datos vectorial",
+      "aliases": ["vector store", "Pinecone", "Vectorize"],
+      "what_it_is": "Guarda representaciones numéricas de textos o imágenes y encuentra las más parecidas entre sí.",
+      "purpose": "Búsqueda por significado y sistemas de preguntas sobre documentos propios.",
+      "pitfalls": [
+        "Se cobra por dimensiones almacenadas y consultadas: el tamaño del modelo de embeddings define el coste.",
+        "Muchos casos se resuelven con búsqueda de texto normal, más barata."
+      ]
+    },
+    "time-series-database": {
+      "name": "Base de series temporales",
+      "aliases": ["InfluxDB", "TimescaleDB", "Prometheus"],
+      "what_it_is": "Optimizada para datos que llegan marcados con la hora y se consultan por rangos de tiempo.",
+      "purpose": "Sensores, métricas de sistemas, cotizaciones: cualquier cosa que se mide repetidamente.",
+      "pitfalls": ["Etiquetar con valores muy variados multiplica el número de series y la factura."]
+    },
+    "graph-database": {
+      "name": "Base de datos de grafos",
+      "aliases": ["Neo4j", "Neptune"],
+      "what_it_is": "Guarda entidades y las relaciones entre ellas como ciudadanos de primera clase.",
+      "purpose": "Redes sociales, detección de fraude, recomendaciones: preguntas sobre caminos y conexiones.",
+      "pitfalls": ["Nicho: si tus preguntas no son sobre relaciones en cadena, SQL basta y cuesta menos."]
+    },
+    "edge-database": {
+      "name": "Base SQL distribuida o de borde",
+      "aliases": ["D1", "Turso", "libSQL", "SQLite gestionado"],
+      "what_it_is": "SQLite gestionado y replicado, pensado para vivir cerca del cómputo de borde.",
+      "purpose": "Aplicaciones pequeñas o medianas que quieren SQL de verdad sin administrar un servidor de base de datos.",
+      "pitfalls": [
+        "Se cobra por filas leídas, no devueltas: sin índices, una consulta puede vaciar la cuota.",
+        "Algunos planes limitan las consultas por invocación, no solo por mes."
+      ]
+    },
+    "data-transfer": {
+      "name": "Transferencia de datos (egreso)",
+      "aliases": ["bandwidth", "ancho de banda", "egress"],
+      "what_it_is": "El tráfico que sale de la infraestructura del proveedor hacia internet.",
+      "purpose": "No se contrata aparte: es el coste que acompaña a todo lo demás.",
+      "pitfalls": [
+        "Es el coste oculto más común de la nube.",
+        "El precio cambia mucho por región: salir desde Sudamérica puede costar seis veces más que desde Estados Unidos.",
+        "Entrar es gratis casi siempre: es fácil meter datos y caro sacarlos."
+      ]
+    },
+    "load-balancer": {
+      "name": "Balanceador de carga",
+      "aliases": ["load balancer", "ALB", "NLB"],
+      "what_it_is": "Reparte las visitas entre varias copias de tu aplicación y aparta las que no responden.",
+      "purpose": "Aguantar más tráfico y sobrevivir a la caída de una instancia.",
+      "pitfalls": [
+        "Tiene un coste fijo por hora que corre aunque no haya tráfico.",
+        "Suele salir más caro que la máquina pequeña a la que sirve."
+      ]
+    },
+    "managed-dns": {
+      "name": "DNS gestionado",
+      "aliases": ["Route 53", "Cloud DNS", "zona DNS"],
+      "what_it_is": "El servicio que traduce tu nombre de dominio a la dirección del servidor.",
+      "purpose": "Que la gente escriba tu dominio y llegue, y poder mover el servicio de sitio sin que nadie lo note.",
+      "pitfalls": [
+        "Los cambios tardan en propagarse según el TTL configurado.",
+        "Es infraestructura crítica: si cae, todo lo demás parece caído."
+      ]
+    },
+    "static-ip": {
+      "name": "Dirección IP fija",
+      "aliases": ["IP elástica", "IP estática"],
+      "what_it_is": "Una dirección de red que te pertenece y no cambia al reiniciar la máquina.",
+      "purpose": "Cuando un tercero necesita autorizar tu dirección concreta, o para enviar correo con buena reputación.",
+      "pitfalls": [
+        "Varios proveedores cobran la IP reservada precisamente cuando NO está en uso.",
+        "Las IPv4 son un recurso escaso y cada vez más caro."
+      ]
+    },
+    "private-network": {
+      "name": "Red privada virtual (VPC)",
+      "aliases": ["VPC", "red privada", "subredes"],
+      "what_it_is": "Una red aislada donde tus servicios se hablan entre sí sin pasar por internet.",
+      "purpose": "Que la base de datos no esté expuesta al mundo y solo la alcance tu aplicación.",
+      "pitfalls": [
+        "Suele ser gratis dentro de una región y cobrarse entre regiones o entre zonas.",
+        "Es un ahorro de seguridad enorme por casi ningún coste: conviene usarla siempre."
+      ]
+    },
+    "tls-certificates": {
+      "name": "Certificados TLS (HTTPS)",
+      "aliases": ["SSL", "HTTPS", "Let's Encrypt"],
+      "what_it_is": "El documento que cifra la conexión y demuestra que tu sitio es quien dice ser.",
+      "purpose": "Que el candado aparezca en el navegador y las contraseñas no viajen en claro.",
+      "pitfalls": [
+        "Gratis y automático en casi todas partes gracias a Let's Encrypt.",
+        "Algunos planes gratuitos NO permiten certificado en tu propio dominio, solo en el subdominio del proveedor."
+      ],
+      "provider_examples": ["Let's Encrypt", "Cloudflare", "incluido en la mayoría de PaaS"]
+    },
+    "waf-ddos": {
+      "name": "Cortafuegos de aplicación y protección DDoS",
+      "aliases": ["WAF", "anti-DDoS", "firewall"],
+      "what_it_is": "Un filtro delante de tu aplicación que bloquea ataques y tráfico malicioso.",
+      "purpose": "Sobrevivir a ataques de saturación y frenar intentos de intrusión automatizados.",
+      "pitfalls": [
+        "Las reglas mal ajustadas bloquean a usuarios legítimos.",
+        "La protección básica suele venir incluida; la avanzada se paga aparte."
+      ]
+    },
+    "zero-trust-access": {
+      "name": "Acceso privado sin confianza implícita",
+      "aliases": ["zero trust", "Cloudflare Tunnel", "bastion"],
+      "what_it_is": "Publica un servicio interno exigiendo identidad, sin abrir puertos ni montar una VPN clásica.",
+      "purpose": "Dar acceso a un panel interno desde cualquier sitio sin exponerlo a internet.",
+      "pitfalls": ["Se cobra por persona con acceso, así que escala con el tamaño del equipo."]
+    },
+    "api-gateway": {
+      "name": "Pasarela de API",
+      "aliases": ["API Gateway"],
+      "what_it_is": "Una puerta única delante de tus servicios que autentica, limita frecuencia y encamina peticiones.",
+      "purpose": "Exponer una API pública con control central de acceso y consumo.",
+      "pitfalls": ["A gran volumen puede costar más que el cómputo al que da acceso."]
+    },
+    "transactional-email": {
+      "name": "Correo transaccional",
+      "aliases": ["SendGrid", "Resend", "SES", "Mailgun"],
+      "what_it_is": "Envío automático de correos individuales disparados por acciones del sistema.",
+      "purpose": "Confirmaciones, recuperación de contraseña, avisos, facturas.",
+      "pitfalls": [
+        "Enviar es fácil; que llegue a la bandeja de entrada no. Hay que configurar SPF, DKIM y DMARC.",
+        "Los proveedores de VPS suelen bloquear el puerto 25 para frenar el correo basura."
+      ]
+    },
+    "mailboxes": {
+      "name": "Buzones de correo",
+      "aliases": ["email hosting", "Google Workspace", "Microsoft 365"],
+      "what_it_is": "Cuentas de correo con tu dominio que las personas leen y escriben.",
+      "purpose": "El correo del equipo: hola@tudominio.com.",
+      "pitfalls": ["Se cobra por buzón y mes; los alias suelen ser gratis y a menudo bastan."]
+    },
+    "sms-messaging": {
+      "name": "SMS y mensajería",
+      "aliases": ["Twilio", "SMS", "WhatsApp Business API"],
+      "what_it_is": "Envío de mensajes de texto o de aplicaciones de mensajería desde tu sistema.",
+      "purpose": "Códigos de verificación, alertas urgentes, recordatorios.",
+      "pitfalls": [
+        "El precio varía enormemente por país: nunca estimes con una tarifa única.",
+        "Muchos países exigen registrar el remitente antes de permitir envíos."
+      ]
+    },
+    "push-notifications": {
+      "name": "Notificaciones push",
+      "aliases": ["FCM", "APNs", "push"],
+      "what_it_is": "Avisos que aparecen en el móvil o el navegador aunque la aplicación esté cerrada.",
+      "purpose": "Recuperar la atención de alguien sin coste por mensaje.",
+      "pitfalls": [
+        "Suele ser gratis o casi, pero requiere permiso explícito y se revoca con facilidad si abusas."
+      ]
+    },
+    "voice-telephony": {
+      "name": "Voz y telefonía (VoIP)",
+      "aliases": ["Twilio Voice", "SIP"],
+      "what_it_is": "Realizar y recibir llamadas telefónicas desde software.",
+      "purpose": "Centralitas, avisos por llamada, verificación por voz.",
+      "pitfalls": [
+        "Se paga el número por mes además de los minutos.",
+        "La calidad depende de la red del usuario, no solo del proveedor."
+      ]
+    },
+    "real-time-video": {
+      "name": "Vídeo en tiempo real",
+      "aliases": ["WebRTC", "videollamadas", "Daily", "LiveKit"],
+      "what_it_is": "Infraestructura para llamadas de vídeo y audio en directo entre varias personas.",
+      "purpose": "Videollamadas, aulas virtuales, atención remota.",
+      "pitfalls": [
+        "Se cobra por minuto y por persona: el coste crece rápido con el tamaño del grupo.",
+        "Grabar y almacenar se cobra aparte."
+      ]
+    },
+    "real-time-chat": {
+      "name": "Mensajería en tiempo real",
+      "aliases": ["WebSocket", "Pusher", "Ably", "realtime"],
+      "what_it_is": "Canal permanente entre servidor y navegador para enviar cambios al instante.",
+      "purpose": "Chats, tableros colaborativos, marcadores en vivo, notificaciones inmediatas.",
+      "pitfalls": [
+        "Se cobra por conexiones simultáneas: cien personas mirando cuesta cien conexiones aunque nadie escriba."
+      ]
+    },
+    "message-queues": {
+      "name": "Colas de mensajes",
+      "aliases": ["SQS", "RabbitMQ", "Queues", "Pub/Sub"],
+      "what_it_is": "Una lista de tareas pendientes que un servicio deja y otro recoge cuando puede.",
+      "purpose": "Desacoplar procesos lentos de la respuesta al usuario y absorber picos de trabajo.",
+      "pitfalls": [
+        "Poner y sacar cuentan por separado.",
+        "Hace falta una cola de mensajes fallidos o los errores se reintentan para siempre."
+      ]
+    },
+    "event-webhooks": {
+      "name": "Webhooks y bus de eventos",
+      "aliases": ["webhooks", "EventBridge", "eventos"],
+      "what_it_is": "Avisos automáticos que un sistema envía a otro cuando algo ocurre.",
+      "purpose": "Que un pago confirmado dispare un correo, o que un cambio en una herramienta actualice otra.",
+      "pitfalls": [
+        "Hay que verificar la firma o cualquiera puede fingir el aviso.",
+        "Se reenvían: el receptor debe tolerar recibir dos veces lo mismo (idempotencia)."
+      ]
+    },
+    "managed-authentication": {
+      "name": "Autenticación gestionada",
+      "aliases": ["Auth0", "Clerk", "Cognito", "identidad como servicio"],
+      "what_it_is": "Delegar el registro, el inicio de sesión y la gestión de contraseñas a un tercero.",
+      "purpose": "No construir ni mantener tú el sistema más sensible de la aplicación.",
+      "pitfalls": [
+        "El precio por usuario activo escala con tu éxito, no con tu consumo técnico.",
+        "Migrar de proveedor es difícil: las contraseñas están cifradas en su formato.",
+        "Para un puñado de administradores puede ser exageradamente caro frente a un login propio."
+      ]
+    },
+    "secrets-management": {
+      "name": "Gestión de secretos",
+      "aliases": ["Secrets Manager", "Vault", "variables secretas"],
+      "what_it_is": "Un almacén cifrado para contraseñas, claves de API y certificados.",
+      "purpose": "Que las credenciales no vivan en el código ni en el repositorio.",
+      "pitfalls": [
+        "Los servicios dedicados se cobran por secreto y por consulta; las variables de entorno de la plataforma suelen bastar y ser gratis.",
+        "Cambiar un secreto casi siempre exige volver a desplegar."
+      ],
+      "provider_examples": ["AWS Secrets Manager", "HashiCorp Vault", "variables de entorno de cada PaaS"]
+    },
+    "kms-encryption": {
+      "name": "Gestión de claves de cifrado (KMS)",
+      "aliases": ["KMS", "Key Vault"],
+      "what_it_is": "Custodia claves criptográficas y realiza el cifrado sin que la clave salga nunca.",
+      "purpose": "Cumplir requisitos regulatorios y proteger datos sensibles en reposo.",
+      "pitfalls": ["Se cobra por clave y mes más por operación: cifrar campo a campo se dispara."]
+    },
+    "pki-certificates": {
+      "name": "Certificados internos (PKI)",
+      "aliases": ["PKI privada", "mTLS"],
+      "what_it_is": "Emitir certificados propios para que tus servicios se autentiquen entre sí.",
+      "purpose": "Comunicación cifrada y verificada dentro de la infraestructura.",
+      "pitfalls": ["Un certificado interno caducado tira el sistema entero y suele pillar por sorpresa."]
+    },
+    "audit-compliance": {
+      "name": "Auditoría y cumplimiento",
+      "aliases": ["CloudTrail", "audit log"],
+      "what_it_is": "Registro inalterable de quién hizo qué en la infraestructura.",
+      "purpose": "Investigar incidentes y cumplir requisitos normativos.",
+      "pitfalls": ["El primer nivel suele ser gratis; conservar historia larga se cobra."]
+    },
+    "code-repository": {
+      "name": "Repositorio de código",
+      "aliases": ["GitHub", "GitLab", "Git"],
+      "what_it_is": "Donde vive el código con todo su historial de cambios.",
+      "purpose": "Trabajar en equipo, revisar cambios y poder volver a cualquier punto del pasado.",
+      "pitfalls": [
+        "Los repositorios privados son gratis casi siempre; lo que se cobra son los minutos de automatización y el almacenamiento de archivos grandes."
+      ]
+    },
+    "ci-cd": {
+      "name": "Integración y despliegue continuos (CI/CD)",
+      "aliases": ["GitHub Actions", "pipelines", "build minutes"],
+      "what_it_is": "Automatiza probar, construir y publicar cada cambio del código.",
+      "purpose": "Que publicar deje de ser un ritual manual propenso a errores.",
+      "pitfalls": [
+        "Se cobra por minutos de construcción, y los ejecutores de macOS cuestan hasta diez veces más que los de Linux.",
+        "Sin caché de dependencias, cada ejecución paga la descarga entera."
+      ]
+    },
+    "container-registry": {
+      "name": "Registro de contenedores",
+      "aliases": ["Docker registry", "ECR", "GHCR"],
+      "what_it_is": "El almacén donde se guardan las imágenes de contenedor listas para desplegar.",
+      "purpose": "Que la plataforma de despliegue pueda descargar la versión exacta que quieres publicar.",
+      "pitfalls": [
+        "Las imágenes viejas se acumulan y nadie las borra: conviene una política de retención.",
+        "Descargar desde otra nube paga egreso."
+      ]
+    },
+    "logs": {
+      "name": "Registros (logs)",
+      "aliases": ["logs", "Datadog", "CloudWatch Logs"],
+      "what_it_is": "La recopilación y búsqueda de todo lo que tu aplicación va anotando.",
+      "purpose": "Entender qué pasó cuando algo falla.",
+      "pitfalls": [
+        "Se paga dos veces: por ingerir y por conservar.",
+        "Es la partida que más se dispara sin aviso; conviene registrar menos y mejor."
+      ]
+    },
+    "metrics": {
+      "name": "Métricas",
+      "aliases": ["Prometheus", "monitoring", "dashboards"],
+      "what_it_is": "Números medidos de forma repetida en el tiempo: uso de CPU, peticiones por minuto, errores.",
+      "purpose": "Ver tendencias y recibir alertas antes de que los usuarios se quejen.",
+      "pitfalls": [
+        "Etiquetar con identificadores únicos provoca explosión de cardinalidad y multiplica el coste."
+      ]
+    },
+    "traces": {
+      "name": "Trazas distribuidas",
+      "aliases": ["tracing", "OpenTelemetry", "APM"],
+      "what_it_is": "Sigue el recorrido completo de una petición a través de todos los servicios que toca.",
+      "purpose": "Encontrar dónde se pierde el tiempo en un sistema con muchas piezas.",
+      "pitfalls": ["Se suele muestrear (guardar solo una fracción) porque guardarlo todo es carísimo."]
+    },
+    "uptime-monitoring": {
+      "name": "Monitoreo de disponibilidad",
+      "aliases": ["uptime monitoring", "health checks", "synthetics"],
+      "what_it_is": "Un robot externo que comprueba periódicamente si tu sitio responde.",
+      "purpose": "Enterarte de una caída antes que tus usuarios.",
+      "pitfalls": [
+        "El intervalo define el coste y también cuánto tardas en enterarte.",
+        "Comprobar desde una sola región no detecta problemas regionales."
+      ]
+    },
+    "error-tracking": {
+      "name": "Seguimiento de errores",
+      "aliases": ["Sentry", "error tracking", "crash reporting"],
+      "what_it_is": "Recoge las excepciones de la aplicación, las agrupa y avisa.",
+      "purpose": "Saber qué se rompe, a cuánta gente afecta y con qué versión empezó.",
+      "pitfalls": ["Se cobra por evento: un error en bucle puede consumir la cuota del mes en una tarde."]
+    },
+    "static-hosting": {
+      "name": "Hosting de sitios estáticos",
+      "aliases": ["Pages", "Netlify", "sitio estático"],
+      "what_it_is": "Publicación de archivos ya generados (HTML, imágenes) sin ningún programa ejecutándose detrás.",
+      "purpose": "Webs informativas, documentación, portfolios y blogs.",
+      "pitfalls": [
+        "Es el nivel gratuito más común de la industria, precisamente porque cuesta muy poco servirlo.",
+        "No sirve si necesitas guardar datos o autenticar usuarios."
+      ]
+    },
+    "shared-hosting": {
+      "name": "Hosting compartido tradicional",
+      "aliases": ["cPanel", "hosting web", "LAMP"],
+      "what_it_is": "Espacio en un servidor compartido con panel de control, pensado para webs con PHP y MySQL.",
+      "purpose": "WordPress y sitios administrados por personas no técnicas.",
+      "pitfalls": [
+        "Las promesas de 'ilimitado' están limitadas por letra pequeña.",
+        "Los precios de renovación suelen duplicar o triplicar el de contratación."
+      ]
+    },
+    "domains": {
+      "name": "Registro de dominios",
+      "aliases": ["dominio", "registrar", "DNS name"],
+      "what_it_is": "El alquiler anual de un nombre en internet.",
+      "purpose": "Tener una dirección propia y estable, independiente de dónde alojes.",
+      "pitfalls": [
+        "El primer año barato y la renovación cara es la norma; compara siempre el precio de renovación.",
+        "Vigila que la privacidad del registro (WHOIS) esté incluida y no se cobre aparte."
+      ]
+    },
+    "managed-search": {
+      "name": "Búsqueda gestionada",
+      "aliases": ["Algolia", "Elasticsearch", "Meilisearch"],
+      "what_it_is": "Un motor que indexa tu contenido y responde búsquedas con tolerancia a erratas y relevancia.",
+      "purpose": "Buscadores de catálogos, documentación o cualquier contenido extenso.",
+      "pitfalls": [
+        "Se cobra por búsqueda y por registro indexado.",
+        "Para catálogos pequeños, la búsqueda de texto completo de PostgreSQL o SQLite suele bastar."
+      ]
+    },
+    "image-processing": {
+      "name": "Procesamiento de imágenes y vídeo",
+      "aliases": ["Cloudinary", "imgix", "transcodificación"],
+      "what_it_is": "Redimensiona, recorta, optimiza y convierte medios bajo demanda.",
+      "purpose": "Servir la imagen del tamaño y formato adecuados a cada dispositivo sin generarlos a mano.",
+      "pitfalls": [
+        "Se cobra por transformación única: muchas variantes por imagen multiplican el coste.",
+        "El vídeo se cobra por minuto codificado y es un orden de magnitud más caro."
+      ]
+    },
+    "maps-geolocation": {
+      "name": "Mapas y geolocalización",
+      "aliases": ["Google Maps", "Mapbox", "geocoding"],
+      "what_it_is": "Mapas interactivos, conversión de direcciones a coordenadas y cálculo de rutas.",
+      "purpose": "Mostrar ubicaciones, calcular distancias y ordenar repartos.",
+      "pitfalls": [
+        "Se cobra por carga de mapa y por llamada: una página que recarga el mapa consume rápido.",
+        "OpenStreetMap es una alternativa gratuita con condiciones de atribución."
+      ]
+    },
+    "web-analytics": {
+      "name": "Analítica web",
+      "aliases": ["Google Analytics", "Plausible", "estadísticas"],
+      "what_it_is": "Mide visitas, recorridos y conversiones en tu sitio.",
+      "purpose": "Saber qué funciona y qué no, y de dónde llega la gente.",
+      "pitfalls": [
+        "Las opciones gratuitas suelen pagarse con los datos de tus visitantes.",
+        "En Europa hay implicaciones legales según dónde se procesen los datos."
+      ]
+    },
+    "payment-gateway": {
+      "name": "Pasarela de pagos",
+      "aliases": ["Stripe", "PayPal", "MercadoPago", "checkout"],
+      "what_it_is": "Procesa cobros con tarjeta u otros medios y te transfiere el dinero.",
+      "purpose": "Vender o recibir aportes sin manejar tú datos de tarjetas.",
+      "pitfalls": [
+        "La comisión fija hace inviables los cobros muy pequeños: en 1 USD puede irse un tercio.",
+        "La disponibilidad por país es un factor decisivo; hay pasarelas que no operan en toda Latinoamérica.",
+        "Manejar tarjetas por tu cuenta implica cumplimiento PCI DSS: casi siempre conviene delegarlo."
+      ]
+    },
+    "language-model": {
+      "name": "Modelo de lenguaje (LLM)",
+      "aliases": ["GPT", "Claude", "API de IA", "chat"],
+      "what_it_is": "Un modelo que recibe texto y genera texto, accesible por API.",
+      "purpose": "Redactar, resumir, clasificar, extraer datos y conversar.",
+      "pitfalls": [
+        "La salida cuesta bastante más que la entrada: separa siempre ambas al estimar.",
+        "Reenviar todo el historial en cada turno multiplica el coste de una conversación larga.",
+        "El almacenamiento en caché del contexto puede reducir mucho la factura si se usa bien."
+      ]
+    },
+    "document-ocr": {
+      "name": "OCR y comprensión de documentos",
+      "aliases": ["OCR", "Textract", "Document AI", "Document Intelligence"],
+      "what_it_is": "Extrae texto —y a veces estructura— de imágenes y PDFs.",
+      "purpose": "Digitalizar recibos, facturas y formularios en papel.",
+      "pitfalls": [
+        "El OCR simple y la extracción estructurada se cobran muy distinto: puede haber diez veces de diferencia.",
+        "Tesseract autoalojado es gratis y suele bastar si las imágenes están limpias; conviene medir la exactitud antes de pagar."
+      ]
+    },
+    "speech-to-text": {
+      "name": "Transcripción de voz a texto",
+      "aliases": ["speech to text", "Whisper", "STT"],
+      "what_it_is": "Convierte audio hablado en texto escrito.",
+      "purpose": "Subtítulos, actas de reuniones, búsqueda dentro de grabaciones.",
+      "pitfalls": [
+        "La exactitud cae mucho con ruido, acentos marcados o varias personas hablando a la vez.",
+        "La identificación de quién habla suele cobrarse aparte."
+      ]
+    },
+    "text-to-speech": {
+      "name": "Síntesis de voz",
+      "aliases": ["text to speech", "TTS"],
+      "what_it_is": "Convierte texto escrito en audio hablado.",
+      "purpose": "Accesibilidad, avisos por voz, narración automática.",
+      "pitfalls": [
+        "Las voces neuronales cuestan varias veces más que las básicas.",
+        "Clonar una voz tiene implicaciones legales y de consentimiento."
+      ]
+    },
+    "translation": {
+      "name": "Traducción automática",
+      "aliases": ["DeepL", "Translate"],
+      "what_it_is": "Traduce texto entre idiomas de forma automática.",
+      "purpose": "Publicar contenido en varios idiomas sin equipo de traducción.",
+      "pitfalls": ["Se cobra por carácter de origen, incluidos espacios y etiquetas HTML si no las excluyes."]
+    },
+    "image-vision": {
+      "name": "Visión artificial",
+      "aliases": ["Vision API", "Rekognition", "clasificación de imágenes"],
+      "what_it_is": "Analiza imágenes para detectar objetos, texto, rostros o contenido inapropiado.",
+      "purpose": "Moderar contenido subido por usuarios, etiquetar catálogos, leer matrículas.",
+      "pitfalls": ["El reconocimiento facial está regulado o prohibido en varias jurisdicciones."]
+    },
+    "scheduled-tasks": {
+      "name": "Tareas programadas (cron)",
+      "aliases": ["cron", "scheduled jobs", "triggers"],
+      "what_it_is": "Ejecuta algo automáticamente a una hora o intervalo fijo.",
+      "purpose": "Informes diarios, limpiezas periódicas, recordatorios, sincronizaciones.",
+      "pitfalls": [
+        "Casi siempre en UTC: los horarios locales y los cambios de hora provocan sorpresas.",
+        "Si una ejecución se solapa con la anterior, puede duplicar trabajo."
+      ]
+    },
+    "workflows": {
+      "name": "Flujos de trabajo (workflows)",
+      "aliases": ["Step Functions", "orquestación", "durable execution"],
+      "what_it_is": "Coordina varios pasos con esperas, reintentos y estado que sobrevive a los fallos.",
+      "purpose": "Procesos largos con varias etapas que no pueden perderse a medias.",
+      "pitfalls": ["Se cobra por transición de estado: un flujo con muchos pasos pequeños sale caro."]
+    },
+    "etl": {
+      "name": "Canalizaciones de datos (ETL)",
+      "aliases": ["ETL", "Airflow", "pipelines de datos"],
+      "what_it_is": "Mueve datos entre sistemas, transformándolos por el camino.",
+      "purpose": "Alimentar un almacén analítico desde las bases de producción.",
+      "pitfalls": [
+        "Las herramientas gestionadas cobran por conector y por fila sincronizada: crece con el volumen de datos, no con su valor."
+      ]
+    }
+  }
+}

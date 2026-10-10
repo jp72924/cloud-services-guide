@@ -1,0 +1,441 @@
+{
+  "version": 1,
+  "updated": "2026-09-07",
+  "description": "Catalog of the units in which cloud services are measured and billed. Stable layer: it changes very little over time.",
+  "limit_types": [
+    {
+      "id": "pooled-quota",
+      "name": "Pool (pooled quota)",
+      "explanation": "A total you can spend however you like during the period. If the month gives you 180,000 vCPU-seconds, you can spend them on one long request or on a million short ones.",
+      "why_it_matters": "A one-off heavy request breaks nothing as long as the month's total is enough."
+    },
+    {
+      "id": "per-request-cap",
+      "name": "Per-request cap",
+      "explanation": "A maximum that no single request can exceed, no matter how much of the total you have left over.",
+      "why_it_matters": "This is the most important distinction in this entire catalog. An expensive operation (verifying a password, generating a PDF) always fails, even if the whole month is unused."
+    },
+    {
+      "id": "daily-cap",
+      "name": "Daily cap",
+      "explanation": "A pool that refills every day, usually at midnight UTC.",
+      "why_it_matters": "A traffic spike in a single day can lock you out until the next day, even if the month is going comfortably."
+    },
+    {
+      "id": "concurrency-cap",
+      "name": "Concurrency cap",
+      "explanation": "How many things can be happening at the same time, with no limit on the cumulative total.",
+      "why_it_matters": "It limits the peak, not the volume. You notice it at peak hours."
+    }
+  ],
+  "units": [
+    {
+      "id": "vcpu-second",
+      "name": "vCPU-second",
+      "dimension": "compute-time",
+      "what_it_measures": "One virtual processor core busy for one second.",
+      "plain_words": "It's 'one second of a processor'. If your program uses 2 cores for 3 seconds, you spent 6 vCPU-seconds.",
+      "formula": "allocated cores × execution seconds",
+      "handy_equivalent": "180,000 vCPU-seconds per month ≈ one core working for 50 hours, or 60,000 requests of 3 seconds.",
+      "used_in": ["managed-containers", "serverless-functions", "edge-compute"]
+    },
+    {
+      "id": "vcpu-hour",
+      "name": "vCPU-hour",
+      "dimension": "compute-time",
+      "what_it_measures": "One virtual core reserved for one hour, whether it's used or not.",
+      "plain_words": "Like renting an engine by the hour: you pay for having it available, even if it's idle.",
+      "formula": "allocated cores × hours powered on",
+      "handy_equivalent": "A 2-core machine running all month = ~1,460 vCPU-hours.",
+      "used_in": ["virtual-machine", "managed-kubernetes", "relational-database"]
+    },
+    {
+      "id": "ocpu-hour",
+      "name": "OCPU-hour",
+      "dimension": "compute-time",
+      "what_it_measures": "An Oracle-specific unit. One OCPU is roughly equivalent to one full physical core, not one thread.",
+      "plain_words": "It's an Oracle vCPU-hour, but each OCPU performs roughly like two vCPUs from other providers.",
+      "warning": "Don't compare OCPUs to vCPUs one to one: you'd underestimate Oracle by a factor of nearly two.",
+      "handy_equivalent": "1,500 OCPU-hours per month = 2 OCPUs running continuously (a month has ~730 hours).",
+      "used_in": ["virtual-machine", "managed-containers"]
+    },
+    {
+      "id": "gb-second",
+      "name": "GB-second",
+      "dimension": "memory-time",
+      "what_it_measures": "One gigabyte of memory reserved for one second.",
+      "plain_words": "It combines how much memory you requested with how long you held it. Half the memory for twice as long costs the same.",
+      "formula": "GB of allocated memory × execution seconds",
+      "handy_equivalent": "400,000 GB-seconds per month ≈ a 512 MB function running for nine days straight.",
+      "used_in": ["serverless-functions", "managed-containers"]
+    },
+    {
+      "id": "gib-second",
+      "name": "GiB-second",
+      "dimension": "memory-time",
+      "what_it_measures": "Same as the GB-second but with gibibytes (1,024 MiB instead of 1,000 MB).",
+      "plain_words": "The same idea, with a slightly bigger ruler: a GiB is 7.4% larger than a GB.",
+      "warning": "Different providers use GB or GiB for the same thing. Comparing without converting introduces a 7% error.",
+      "used_in": ["managed-containers", "serverless-functions"]
+    },
+    {
+      "id": "cpu-ms-per-request",
+      "name": "CPU milliseconds per request",
+      "dimension": "compute-time",
+      "what_it_measures": "How long a single request can occupy the processor, from start to finish.",
+      "plain_words": "A stopwatch per visit. If your code takes longer than allowed to think, that visit fails.",
+      "typical_limit_type": "per-request-cap",
+      "warning": "It doesn't count waiting time (database queries, calls to other APIs): only the actual computation. That's why a slow query doesn't penalize you, but hashing a password does.",
+      "handy_equivalent": "10 ms is more than enough to assemble a page; it isn't enough to verify a password with PBKDF2 at 100,000 iterations, which costs about 33 ms.",
+      "used_in": ["edge-compute"]
+    },
+    {
+      "id": "cpu-minutes-per-day",
+      "name": "CPU minutes per day",
+      "dimension": "compute-time",
+      "what_it_measures": "A daily pool of processing that refills every 24 hours.",
+      "plain_words": "A daily work allowance. Once it runs out, the site stops responding until the next day.",
+      "typical_limit_type": "daily-cap",
+      "handy_equivalent": "60 minutes per day = 3,600 seconds of computation, about 1,200 requests of 3 seconds.",
+      "used_in": ["application-platform"]
+    },
+    {
+      "id": "gpu-hour",
+      "name": "GPU-hour",
+      "dimension": "specialized-compute-time",
+      "what_it_measures": "One accelerator card reserved for one hour.",
+      "plain_words": "Renting a graphics card to train or run artificial intelligence models.",
+      "warning": "It's the most expensive unit in the catalog, between 10 and 100 times a vCPU-hour. The card model matters as much as the number of hours.",
+      "used_in": ["gpu-accelerators"]
+    },
+    {
+      "id": "request",
+      "name": "Request",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Every time someone or something asks your service for something.",
+      "plain_words": "A visit, a call, a click that reaches the server. Loading a page usually generates several.",
+      "warning": "A single visit from one person can count as 10 or 20 requests if the page requests images, fonts, and data separately.",
+      "used_in": ["edge-compute", "serverless-functions", "managed-containers", "cdn", "api-gateway"]
+    },
+    {
+      "id": "invocation",
+      "name": "Invocation",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Each execution of a function, wherever it comes from.",
+      "plain_words": "Like a request, but counting code starts instead of visits: it includes whatever a timer or a queue triggers.",
+      "used_in": ["serverless-functions", "scheduled-tasks"]
+    },
+    {
+      "id": "class-a-operation",
+      "name": "Class A operation (write)",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Operations that modify or list: uploading, copying, listing contents.",
+      "plain_words": "The 'expensive' operations of file storage.",
+      "warning": "They cost on the order of ten times more than read operations. Listing a folder counts as a write even though you write nothing.",
+      "used_in": ["object-storage"]
+    },
+    {
+      "id": "class-b-operation",
+      "name": "Class B operation (read)",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Operations that only read: downloading a file, checking whether it exists.",
+      "plain_words": "The 'cheap' operations of file storage.",
+      "used_in": ["object-storage"]
+    },
+    {
+      "id": "ru-second",
+      "name": "RU/s (request units per second)",
+      "dimension": "reserved-database-capacity",
+      "what_it_measures": "A composite Azure Cosmos DB unit that blends read, write, CPU, and memory into a single number.",
+      "plain_words": "A per-second effort budget for the database. Reading a small document costs ~1 RU; writing it costs ~5.",
+      "warning": "It's reserved up front, not consumed by usage: you pay for the capacity even if nobody uses it.",
+      "used_in": ["document-database"]
+    },
+    {
+      "id": "row-read",
+      "name": "Row read",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Every row the database had to examine to answer, not the ones it returned.",
+      "plain_words": "If you look for a needle in a haystack with no index, you pay for the whole haystack even though you walk away with one needle.",
+      "warning": "A poorly indexed query can read millions of rows and return one. It's the most common way to exhaust a quota without realizing it.",
+      "used_in": ["edge-database"]
+    },
+    {
+      "id": "row-written",
+      "name": "Row written",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Every row inserted, modified, or deleted.",
+      "plain_words": "Every new or corrected entry in the database.",
+      "warning": "Updating a row that has indexes also counts the updates to those indexes.",
+      "used_in": ["edge-database"]
+    },
+    {
+      "id": "query",
+      "name": "Query",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Every instruction sent to the database.",
+      "plain_words": "Every question your program asks the database.",
+      "warning": "Some plans limit how many queries you can make within a single request, not just how many per month.",
+      "used_in": ["relational-database", "edge-database", "managed-search"]
+    },
+    {
+      "id": "lcu",
+      "name": "LCU (load balancer capacity unit)",
+      "dimension": "network-capacity",
+      "what_it_measures": "A composite AWS unit that blends new connections, active connections, bandwidth, and evaluated rules.",
+      "plain_words": "A made-up number that summarizes how much work you gave the traffic dispatcher.",
+      "warning": "You're billed for the dimension you consume the most, not for the sum. Hard to estimate in advance.",
+      "used_in": ["load-balancer"]
+    },
+    {
+      "id": "gb-month",
+      "name": "GB-month",
+      "dimension": "storage-time",
+      "what_it_measures": "One gigabyte stored for a full month.",
+      "plain_words": "It's not 'how much you store' but 'how much you store for how long'. Ten GB for half a month = 5 GB-months.",
+      "formula": "GB stored × fraction of the month they were there",
+      "used_in": ["object-storage", "block-storage", "file-storage", "cold-storage", "backups"]
+    },
+    {
+      "id": "gib",
+      "name": "GiB (gibibyte)",
+      "dimension": "storage",
+      "what_it_measures": "1,073,741,824 bytes: 1,024 mebibytes.",
+      "plain_words": "A 'computing gigabyte'. It's 7.4% larger than the commercial gigabyte (1 billion bytes).",
+      "warning": "When one provider says GiB and another says GB for the same product, a direct comparison is off by 7%. Always check which one each uses.",
+      "used_in": ["block-storage", "managed-containers"]
+    },
+    {
+      "id": "iops",
+      "name": "IOPS (input/output operations per second)",
+      "dimension": "disk-throughput",
+      "what_it_measures": "How many individual reads or writes the disk can handle per second.",
+      "plain_words": "How many times per second the disk can serve a request. It matters when there are many small accesses, as in a database.",
+      "warning": "Many cheap disks give 'burstable' IOPS: they perform well for a while and then get throttled.",
+      "used_in": ["block-storage", "relational-database"]
+    },
+    {
+      "id": "mb-per-second",
+      "name": "MB/s (sustained throughput)",
+      "dimension": "disk-or-network-throughput",
+      "what_it_measures": "How many megabytes per second it can move continuously.",
+      "plain_words": "The width of the hose. It matters for large files; IOPS matter for small files.",
+      "used_in": ["block-storage", "file-storage"]
+    },
+    {
+      "id": "min-retention-days",
+      "name": "Minimum retention days",
+      "dimension": "time-commitment",
+      "what_it_measures": "The minimum time you'll be billed for a file, even if you delete it earlier.",
+      "plain_words": "A minimum commitment. If you put something in archive storage with a 90-day minimum and delete it the next day, you pay the 90 days anyway.",
+      "warning": "It's the classic cold storage trap: it looks ten times cheaper until you need to rotate the data.",
+      "used_in": ["cold-storage", "backups"]
+    },
+    {
+      "id": "stored-objects",
+      "name": "Number of objects",
+      "dimension": "quantity",
+      "what_it_measures": "How many files are stored, regardless of their size.",
+      "plain_words": "A million tiny files can cost more than one huge file, because each one carries its own record.",
+      "used_in": ["object-storage"]
+    },
+    {
+      "id": "gb-egress",
+      "name": "GB out (egress)",
+      "dimension": "network-transfer",
+      "what_it_measures": "Data leaving the provider toward the internet or another region.",
+      "plain_words": "What it costs for your visitors to download your pages, images, and files.",
+      "warning": "It's the most common hidden cost in the entire cloud, and the one that varies most by region: egress from São Paulo can cost six times more than from Virginia. Bringing data in (ingress) is almost always free.",
+      "handy_equivalent": "1 GB per month ≈ 2,000 visits to a 500 KB text page. It runs out very quickly if you serve images or video.",
+      "used_in": ["object-storage", "virtual-machine", "cdn", "managed-containers"]
+    },
+    {
+      "id": "gb-ingress",
+      "name": "GB in (ingress)",
+      "dimension": "network-transfer",
+      "what_it_measures": "Data coming into the provider from outside.",
+      "plain_words": "What your users upload. It's almost always free, precisely so that it's easy for you to get data in and hard to get it out.",
+      "used_in": ["object-storage", "virtual-machine"]
+    },
+    {
+      "id": "requests-per-second",
+      "name": "Requests per second",
+      "dimension": "instantaneous-capacity",
+      "what_it_measures": "How much simultaneous traffic it can handle before rejecting or queuing.",
+      "plain_words": "The peak it can handle, not the total it processes.",
+      "typical_limit_type": "concurrency-cap",
+      "used_in": ["api-gateway", "load-balancer", "waf-ddos"]
+    },
+    {
+      "id": "dns-queries-month",
+      "name": "DNS queries per month",
+      "dimension": "amount-of-work",
+      "what_it_measures": "How many times someone asked for your domain's address.",
+      "plain_words": "Every time a new browser looks up where your site lives.",
+      "used_in": ["managed-dns"]
+    },
+    {
+      "id": "email-sent",
+      "name": "Email sent",
+      "dimension": "message-count",
+      "what_it_measures": "Every message delivered to the recipient's mail server.",
+      "plain_words": "Every email your system sends: confirmations, password recovery, notices.",
+      "warning": "A send to 100 recipients counts as 100, not 1.",
+      "used_in": ["transactional-email"]
+    },
+    {
+      "id": "sms-per-destination",
+      "name": "SMS (priced by country)",
+      "dimension": "message-count",
+      "what_it_measures": "Each text message, billed according to the destination country and carrier.",
+      "plain_words": "Unlike email, here the price changes radically depending on where you send: there can be twentyfold differences between countries.",
+      "warning": "Never estimate the cost of SMS with a single price: it has to be calculated per destination country.",
+      "used_in": ["sms-messaging"]
+    },
+    {
+      "id": "voice-minute",
+      "name": "Voice minute",
+      "dimension": "communication-time",
+      "what_it_measures": "Every minute of a call, usually distinguishing inbound from outbound.",
+      "plain_words": "Like the good old phone rate, with a different price depending on the destination.",
+      "used_in": ["voice-telephony"]
+    },
+    {
+      "id": "participant-minute",
+      "name": "Participant-minute",
+      "dimension": "time-times-people",
+      "what_it_measures": "One attendee connected for one minute.",
+      "plain_words": "A meeting of 5 people for 10 minutes is 50 participant-minutes, not 10.",
+      "warning": "Cost grows with the square of the group size in mesh video calls: it's the unit that surprises people most on the bill.",
+      "used_in": ["real-time-video"]
+    },
+    {
+      "id": "push-notification",
+      "name": "Push notification",
+      "dimension": "message-count",
+      "what_it_measures": "Every alert sent to a mobile device or browser.",
+      "plain_words": "Every time you make someone's phone ring.",
+      "used_in": ["push-notifications"]
+    },
+    {
+      "id": "concurrent-connection",
+      "name": "Concurrent connection",
+      "dimension": "instantaneous-capacity",
+      "what_it_measures": "How many clients can be connected at the same time on a persistent basis.",
+      "plain_words": "In a chat or a live board, how many people can be watching at the same time.",
+      "typical_limit_type": "concurrency-cap",
+      "used_in": ["real-time-chat", "relational-database"]
+    },
+    {
+      "id": "queue-message",
+      "name": "Queue message",
+      "dimension": "amount-of-work",
+      "what_it_measures": "Every message put into or taken out of a work queue.",
+      "plain_words": "Every task you leave noted down to process later.",
+      "warning": "Putting in and taking out usually count as two separate operations.",
+      "used_in": ["message-queues"]
+    },
+    {
+      "id": "mau",
+      "name": "MAU (monthly active user)",
+      "dimension": "people-count",
+      "what_it_measures": "How many distinct people used the service at least once in the month.",
+      "plain_words": "It doesn't count how many accounts you have, but how many were used this month.",
+      "warning": "It's the most dangerous pricing unit for a growing product: cost rises with users even if each one does very little.",
+      "used_in": ["managed-authentication", "web-analytics"]
+    },
+    {
+      "id": "input-token",
+      "name": "Input token",
+      "dimension": "text-processed",
+      "what_it_measures": "The pieces of text you send to a language model.",
+      "plain_words": "A token is a piece of a word. In Spanish, about 100 tokens equal 70 or 80 words.",
+      "warning": "Input tokens usually cost 3 to 5 times less than output tokens. Counting them together distorts any estimate.",
+      "used_in": ["language-model"]
+    },
+    {
+      "id": "output-token",
+      "name": "Output token",
+      "dimension": "text-generated",
+      "what_it_measures": "The pieces of text the model generates as its response.",
+      "plain_words": "What the model writes. It's the expensive part.",
+      "used_in": ["language-model"]
+    },
+    {
+      "id": "ocr-page",
+      "name": "Processed page",
+      "dimension": "document-count",
+      "what_it_measures": "Every page from which text is extracted.",
+      "plain_words": "A photo of a receipt or a sheet of a PDF.",
+      "warning": "A 20-page PDF counts as 20, not 1.",
+      "used_in": ["document-ocr"]
+    },
+    {
+      "id": "character",
+      "name": "Character",
+      "dimension": "text-amount",
+      "what_it_measures": "Every letter, number, or symbol processed.",
+      "plain_words": "The typical unit of machine translation and speech synthesis. A page of text is about 2,000 characters.",
+      "used_in": ["translation", "text-to-speech"]
+    },
+    {
+      "id": "audio-minute",
+      "name": "Audio minute",
+      "dimension": "media-time",
+      "what_it_measures": "Every minute of recording transcribed or analyzed.",
+      "plain_words": "The length of the recording, not what was said in it.",
+      "used_in": ["speech-to-text"]
+    },
+    {
+      "id": "processed-image",
+      "name": "Processed image",
+      "dimension": "media-count",
+      "what_it_measures": "Every image analyzed, transformed, or generated.",
+      "plain_words": "Every photo the service looks at or creates.",
+      "used_in": ["image-vision", "image-processing"]
+    },
+    {
+      "id": "gb-ingested",
+      "name": "GB ingested",
+      "dimension": "data-volume",
+      "what_it_measures": "How much log data entered the observability system.",
+      "plain_words": "The weight of everything your application writes about itself.",
+      "warning": "Logs grow much faster than people expect, and they're billed twice: for ingesting and for retaining.",
+      "used_in": ["logs"]
+    },
+    {
+      "id": "active-time-series",
+      "name": "Active time series",
+      "dimension": "indicator-count",
+      "what_it_measures": "Every unique combination of metric and labels that received data.",
+      "plain_words": "If you measure 'requests' with a label per country and you have 50 countries, that's 50 series, not one.",
+      "warning": "Adding a label with many possible values (such as the user identifier) can multiply the bill by a thousand. This is called cardinality explosion.",
+      "used_in": ["metrics"]
+    },
+    {
+      "id": "span",
+      "name": "Span (trace)",
+      "dimension": "event-count",
+      "what_it_measures": "Every step recorded within the path of a request.",
+      "plain_words": "A request that passes through five components generates five spans.",
+      "used_in": ["traces"]
+    },
+    {
+      "id": "synthetic-check",
+      "name": "Availability check",
+      "dimension": "check-count",
+      "what_it_measures": "Every time a bot checks whether your site responds.",
+      "plain_words": "Checking every minute is ~43,200 checks per month; every five minutes, ~8,640. The interval determines the cost.",
+      "used_in": ["uptime-monitoring"]
+    },
+    {
+      "id": "transaction-percentage",
+      "name": "Per-transaction percentage + fixed",
+      "dimension": "transaction-fee",
+      "what_it_measures": "A proportional share of the amount plus a fixed amount per operation.",
+      "plain_words": "Typically something like '2.9% + 0.30 USD'. On small charges the fixed part dominates: on a 1 USD charge, the fee can be a third.",
+      "warning": "It's the only unit in the catalog that scales with your revenue and not with your technical consumption.",
+      "used_in": ["payment-gateway"]
+    }
+  ]
+}

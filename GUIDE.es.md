@@ -1,6 +1,8 @@
 # Guía de servicios de internet y nube
 
-Esta guía explica **cómo leer una oferta de nube sin que te engañen**. Los datos concretos viven en `datos/`; aquí están las ideas que hacen falta para interpretarlos.
+[English](GUIDE.md)
+
+Esta guía explica **cómo leer una oferta de nube sin que te engañen**. Los datos concretos viven en `data/`; aquí están las ideas que hacen falta para interpretarlos.
 
 Está escrita para que la entienda alguien sin formación técnica. Si algo no se entiende, es un defecto de la guía, no del lector.
 
@@ -52,7 +54,7 @@ La diferencia es del 7,4 %. Proveedores distintos usan uno u otro para el mismo 
 9. **Inteligencia artificial** — servicios que interpretan o generan texto, voz e imágenes.
 10. **Orquestación** — qué se ejecuta, cuándo y en qué orden.
 
-El detalle de los 71 tipos está en `datos/tipos.json` y en la página generada.
+El detalle de los 71 tipos está en `data/types.json` y en la página generada.
 
 ---
 
@@ -98,7 +100,7 @@ Todas encontradas verificando ofertas reales, no hipotéticas.
 
 ## Cómo comparar dos ofertas, en orden
 
-1. **¿Qué tipo de servicio es?** Busca el tipo en `datos/tipos.json`: te dice en qué unidades se mide.
+1. **¿Qué tipo de servicio es?** Busca el tipo en `data/types.json`: te dice en qué unidades se mide.
 2. **Convierte a la misma unidad.** Si una da OCPU-horas y otra vCPU-segundos, pásalas a lo mismo. Una OCPU rinde aproximadamente como dos vCPU.
 3. **Mira si es bolsa o tope.** Un tope pequeño puede inutilizar el servicio aunque el total sea generoso.
 4. **Busca el egreso.** Si no aparece en la comparación, falta el coste que más sorprende.
@@ -121,4 +123,4 @@ Durante la investigación que originó estos datos se consultó un agregador de 
 - **Azure**: clasificaba la base SQL gratuita como oferta de 12 meses cuando Microsoft documenta que dura **toda la vida de la suscripción**. Un error que habría descartado la mejor característica de Azure para el caso que se estaba evaluando.
 - **DigitalOcean**: cifraba el nivel gratuito de Functions en 25 000 GiB-segundos al mes. La página oficial dice **90 000**, tres veces y media más. Aquí el error iba en la otra dirección: habría hecho descartar por pequeño un nivel que en realidad alcanza para 720 000 invocaciones de una función ligera.
 
-La conclusión no es «los agregadores mienten», sino algo más útil: **sirven para descubrir opciones, no para decidir**. Por eso cada fila de `datos/ofertas.json` lleva su URL y un campo `confianza` que distingue lo confirmado en documentación oficial de lo que no.
+La conclusión no es «los agregadores mienten», sino algo más útil: **sirven para descubrir opciones, no para decidir**. Por eso cada fila de `data/offers.json` lleva su URL y un campo `confidence` que distingue lo confirmado en documentación oficial de lo que no.

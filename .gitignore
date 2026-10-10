@@ -1,6 +1,6 @@
-# Producto generado: se reconstruye con node scripts/generar.mjs
-guia.html
+# Generated product: rebuilt with node scripts/build.mjs
+guide.html
 
-# Sistema
+# System
 .DS_Store
 node_modules/

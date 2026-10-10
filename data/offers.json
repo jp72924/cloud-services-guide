@@ -1,0 +1,1128 @@
+{
+  "version": 1,
+  "updated": "2026-09-07",
+  "description": "Concrete provider offers. VOLATILE LAYER: it expires quickly. Every row carries a verification date and a source. Reverify before deciding.",
+  "warning": "Oracle cut its free quota in half in August 2026 without a public announcement. Treat any row more than 90 days old as suspect.",
+  "pricing_models": [
+    {
+      "id": "perpetual-free",
+      "name": "Perpetual free",
+      "explanation": "Free with no end date, within certain limits. The provider can change it, and does."
+    },
+    {
+      "id": "monthly-renewable-quota",
+      "name": "Monthly renewable quota",
+      "explanation": "Each month you get the same amount free again. Unused amounts do not carry over."
+    },
+    { "id": "daily-renewable-quota", "name": "Daily renewable quota", "explanation": "Resets every day, usually at midnight UTC." },
+    {
+      "id": "one-time-credit",
+      "name": "One-time credit that runs out",
+      "explanation": "A sum of money given away to spend. When it is gone, it is gone."
+    },
+    {
+      "id": "time-limited-free",
+      "name": "Free for a limited time",
+      "explanation": "Free for N months, and after that it is charged or shut down."
+    },
+    {
+      "id": "time-subscription",
+      "name": "Time-based subscription",
+      "explanation": "Fixed price per month or per year, no matter how much you use."
+    },
+    { "id": "metered-usage", "name": "Metered usage", "explanation": "You pay exactly for what you consume, with no minimum." },
+    {
+      "id": "base-plus-overage",
+      "name": "Fixed base plus overage",
+      "explanation": "A fixed fee that includes a certain amount of usage, plus a rate for whatever goes beyond it."
+    },
+    {
+      "id": "per-transaction",
+      "name": "Per transaction",
+      "explanation": "A fee on each operation, usually a percentage plus a fixed amount."
+    }
+  ],
+  "offers": [
+    {
+      "id": "cloudflare-workers-free",
+      "provider": "Cloudflare",
+      "service": "Workers (free plan)",
+      "type": "edge-compute",
+      "free": true,
+      "pricing_model": "daily-renewable-quota",
+      "card_required": false,
+      "expires": null,
+      "includes": [
+        { "unit": "request", "amount": 100000, "period": "day", "limit_type": "daily-cap" },
+        { "unit": "cpu-ms-per-request", "amount": 10, "period": null, "limit_type": "per-request-cap" }
+      ],
+      "price": "0 USD",
+      "overage_price": "Error 1027 when the daily requests are exceeded. For more CPU you have to move to Workers Paid (5 USD/month).",
+      "notes": "The 10 ms is a PER-REQUEST CAP, not a pool: a single heavy operation always fails. The only one in this list that does not ask for a card.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://developers.cloudflare.com/workers/platform/limits/"]
+    },
+    {
+      "id": "cloudflare-workers-paid",
+      "provider": "Cloudflare",
+      "service": "Workers Paid",
+      "type": "edge-compute",
+      "free": false,
+      "pricing_model": "base-plus-overage",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "cpu-ms-per-request", "amount": 30000, "period": null, "limit_type": "per-request-cap" }
+      ],
+      "price": "5 USD/month",
+      "notes": "Raises the CPU cap from 10 ms to 30 s by default, extendable to 5 minutes. It is the way to keep a strong password hash.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://developers.cloudflare.com/workers/platform/limits/"]
+    },
+    {
+      "id": "cloudflare-d1-free",
+      "provider": "Cloudflare",
+      "service": "D1 (free plan)",
+      "type": "edge-database",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": false,
+      "expires": null,
+      "includes": [
+        { "unit": "gb-month", "amount": 0.5, "period": "month", "note": "per database" },
+        { "unit": "gb-month", "amount": 5, "period": "month", "note": "account total" },
+        { "unit": "query", "amount": 50, "period": null, "limit_type": "per-request-cap", "note": "per Worker invocation" }
+      ],
+      "price": "0 USD",
+      "notes": "Up to 10 databases. Real SQL (SQLite) with batch transactions.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://developers.cloudflare.com/d1/platform/limits/"]
+    },
+    {
+      "id": "azure-container-apps-free",
+      "provider": "Microsoft Azure",
+      "service": "Container Apps (free monthly grant)",
+      "type": "managed-containers",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "vcpu-second", "amount": 180000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "gib-second", "amount": 360000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "request", "amount": 2000000, "period": "month", "limit_type": "pooled-quota" }
+      ],
+      "price": "0 USD within the grant",
+      "notes": "No per-request CPU cap. Scales to zero, with cold starts. Pairs well with the free Azure SQL.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://azure.microsoft.com/en-us/pricing/details/container-apps/"]
+    },
+    {
+      "id": "azure-sql-free",
+      "provider": "Microsoft Azure",
+      "service": "Azure SQL Database (free offer)",
+      "type": "relational-database",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "vcpu-hour", "amount": 27.8, "period": "month", "note": "100,000 vCore-seconds", "limit_type": "pooled-quota" },
+        { "unit": "gb-month", "amount": 32, "period": "month", "note": "data, per database" },
+        { "unit": "gb-month", "amount": 32, "period": "month", "note": "backups, per database" }
+      ],
+      "price": "0 USD",
+      "notes": "THE MOST VALUABLE FACT IN THIS TABLE: it is free for the entire lifetime of the subscription, not 12 months, and it works for any subscription type. Neither AWS nor Google has an equivalent. Up to 10 databases. When the quota runs out it is paused until the following month, or you pay the overage if you choose to.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://learn.microsoft.com/en-us/azure/azure-sql/database/free-offer"]
+    },
+    {
+      "id": "azure-app-service-f1",
+      "provider": "Microsoft Azure",
+      "service": "App Service plan F1",
+      "type": "application-platform",
+      "free": true,
+      "pricing_model": "daily-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "cpu-minutes-per-day", "amount": 60, "period": "day", "limit_type": "daily-cap" },
+        { "unit": "gb-month", "amount": 1, "period": "month", "note": "storage" }
+      ],
+      "price": "0 USD",
+      "notes": "1 GB of RAM. NO TLS certificate on a custom domain and no SLA; Microsoft states that it is not supported for production.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://azure.microsoft.com/en-us/pricing/details/app-service/linux/"]
+    },
+    {
+      "id": "gcp-cloud-run-free",
+      "provider": "Google Cloud",
+      "service": "Cloud Run (Always Free)",
+      "type": "managed-containers",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "request", "amount": 2000000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "vcpu-second", "amount": 180000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "gib-second", "amount": 360000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "gb-egress", "amount": 1, "period": "month", "note": "from North America" }
+      ],
+      "price": "0 USD within the quota",
+      "notes": "No per-request CPU cap. Requires a billing account even if you pay nothing.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://docs.cloud.google.com/free/docs/free-cloud-features"]
+    },
+    {
+      "id": "gcp-e2-micro-free",
+      "provider": "Google Cloud",
+      "service": "Compute Engine e2-micro (Always Free)",
+      "type": "virtual-machine",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "vcpu-hour", "amount": 730, "period": "month", "note": "1 instance running all month" },
+        { "unit": "gb-month", "amount": 30, "period": "month", "note": "standard persistent disk" },
+        { "unit": "gb-egress", "amount": 1, "period": "month", "note": "from North America" }
+      ],
+      "price": "0 USD",
+      "notes": "The only permanently free VM from a hyperscaler, always on and with no cold starts. Only in us-west1, us-central1 and us-east1. 1 GB of RAM. The real limit is the 1 GB per month of egress.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://docs.cloud.google.com/free/docs/free-cloud-features"]
+    },
+    {
+      "id": "gcp-firestore-free",
+      "provider": "Google Cloud",
+      "service": "Firestore (Always Free)",
+      "type": "document-database",
+      "free": true,
+      "pricing_model": "daily-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "gb-month", "amount": 1, "period": "month", "note": "GiB per project" },
+        { "unit": "row-read", "amount": 50000, "period": "day", "limit_type": "daily-cap" },
+        { "unit": "row-written", "amount": 20000, "period": "day", "limit_type": "daily-cap" }
+      ],
+      "price": "0 USD",
+      "notes": "It is document-oriented NoSQL: migrating here from SQL forces you to rewrite the entire data layer, not just the queries.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://docs.cloud.google.com/free/docs/free-cloud-features"]
+    },
+    {
+      "id": "gcp-trial",
+      "provider": "Google Cloud",
+      "service": "Welcome credit",
+      "type": "virtual-machine",
+      "free": true,
+      "pricing_model": "one-time-credit",
+      "card_required": true,
+      "expires": null,
+      "includes": [],
+      "price": "300 USD credit for 90 days",
+      "notes": "There is no always-free SQL database on Google Cloud: Cloud SQL only has a 30-day trial.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://docs.cloud.google.com/free/docs/free-cloud-features"]
+    },
+    {
+      "id": "aws-lambda-free",
+      "provider": "AWS",
+      "service": "Lambda (Always Free)",
+      "type": "serverless-functions",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "invocation", "amount": 1000000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "gb-second", "amount": 400000, "period": "month", "limit_type": "pooled-quota" }
+      ],
+      "price": "0 USD",
+      "notes": "Indefinite, it does not expire. Hard limit of 6 MB on the body of a synchronous invocation, which rules out large file uploads.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://aws.amazon.com/lambda/pricing/"]
+    },
+    {
+      "id": "aws-free-plan-account",
+      "provider": "AWS",
+      "service": "Free plan for new accounts",
+      "type": "virtual-machine",
+      "free": true,
+      "pricing_model": "one-time-credit",
+      "card_required": true,
+      "expires": "6 months from sign-up",
+      "includes": [],
+      "price": "100 USD credit on sign-up, up to 100 USD more for completing activities",
+      "notes": "WARNING: since July 2025 the account CLOSES after 6 months or when the credit runs out. Accounts created before that date keep the old 12-month scheme. To keep an account permanently you have to move to the paid plan.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://aws.amazon.com/free/"]
+    },
+    {
+      "id": "aws-ec2-t4g-trial",
+      "provider": "AWS",
+      "service": "EC2 t4g.small (free trial)",
+      "type": "virtual-machine",
+      "free": true,
+      "pricing_model": "time-limited-free",
+      "card_required": true,
+      "expires": "2026-12-31",
+      "includes": [
+        { "unit": "vcpu-hour", "amount": 750, "period": "month", "note": "aggregated across all regions" }
+      ],
+      "price": "0 USD until December 31, 2026",
+      "notes": "For new and existing customers. 750 hours cover one instance running all month. The disk is not included. When the program ends it reverts to the regular rate.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": [
+        "https://repost.aws/articles/ARi_gf6vo6TuqNtMQdiYPKyA/announcing-amazon-ec2-t4g-free-trial-extension"
+      ]
+    },
+    {
+      "id": "aws-ec2-micro-12-months",
+      "provider": "AWS",
+      "service": "EC2 t2.micro / t3.micro (12-month free tier, legacy)",
+      "type": "virtual-machine",
+      "free": true,
+      "pricing_model": "time-limited-free",
+      "card_required": true,
+      "expires": "12 months from sign-up; only accounts created before July 15, 2025",
+      "includes": [
+        {
+          "unit": "vcpu-hour",
+          "amount": 750,
+          "period": "month",
+          "note": "t2.micro instance hours, Linux and Windows counted separately; aggregated across regions. Where t2.micro is not available (e.g., Stockholm, Bahrain), t3.micro applies"
+        },
+        {
+          "unit": "gb-month",
+          "amount": 30,
+          "period": "month",
+          "note": "EBS (standard, st1, sc1, gp2, gp3); figure from the historical program, not reconfirmed in the current documentation"
+        }
+      ],
+      "price": "0 USD within the quota; beyond it, billed at the regular rate",
+      "notes": "Legacy program: it is no longer granted. Since the term is 12 months from sign-up and the last possible sign-up was July 14, 2025, I infer that it has expired for all accounts around July 14, 2026 (inference, AWS does not state it). New accounts (from July 15, 2025) have no hours quota but credit instead: see aws-free-plan-account. On them the console marks t3.micro, t3.small, t4g.micro, t4g.small, c7i-flex.large and m7i-flex.large as eligible, but they consume credit and cannot exceed the limit. t4g.micro does not exist in the legacy program. The 750 h/month cover one instance running all month (a 31-day month is 744 h).",
+      "confidence": "official",
+      "verified": "2026-10-09",
+      "sources": [
+        "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-free-tier-usage.html",
+        "https://aws.amazon.com/free/legacy/free-tier-faqs"
+      ]
+    },
+    {
+      "id": "oracle-always-free-arm",
+      "provider": "Oracle Cloud",
+      "service": "Always Free — Ampere A1 (ARM)",
+      "type": "virtual-machine",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "ocpu-hour", "amount": 1500, "period": "month", "note": "= 2 OCPUs running continuously", "limit_type": "pooled-quota" },
+        { "unit": "gb-month", "amount": 200, "period": "month", "note": "block storage, total" },
+        { "unit": "gb-month", "amount": 20, "period": "month", "note": "object storage" }
+      ],
+      "price": "0 USD",
+      "notes": "CUT IN HALF in August 2026: it was 3,000 OCPU-hours and 18,000 GB-hours (4 OCPU / 24 GB) and it became 1,500 and 9,000 (2 OCPU / 12 GB). Effective from June 15, applied on August 18, without a public announcement. Requires a real credit card: virtual and prepaid cards are not accepted. Idle instances may be reclaimed.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": [
+        "https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm",
+        "https://www.infoq.com/news/2026/07/oracle-cloud-free-tier-limits/"
+      ]
+    },
+    {
+      "id": "oracle-autonomous-db-free",
+      "provider": "Oracle Cloud",
+      "service": "Always Free — Autonomous Database",
+      "type": "relational-database",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "gb-month", "amount": 20, "period": "month", "note": "per instance, 2 instances" },
+        { "unit": "concurrent-connection", "amount": 20, "period": null, "limit_type": "concurrency-cap" }
+      ],
+      "price": "0 USD",
+      "notes": "Real, managed SQL, permanent. The second always-free SQL database on the market, alongside Azure. Neither CPU nor storage can be expanded on this tier.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": [
+        "https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm"
+      ]
+    },
+    {
+      "id": "digitalocean-app-platform-free",
+      "provider": "DigitalOcean",
+      "service": "App Platform (free tier)",
+      "type": "static-hosting",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "gb-egress", "amount": 1, "period": "month", "note": "GiB per application, 3 applications" }
+      ],
+      "price": "0 USD",
+      "notes": "ONLY static sites. It does not support applications with a server: for that the minimum is 5 USD/month.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://docs.digitalocean.com/products/app-platform/details/pricing/"]
+    },
+    {
+      "id": "digitalocean-functions",
+      "provider": "DigitalOcean",
+      "service": "Functions",
+      "type": "serverless-functions",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "gib-second", "amount": 90000, "period": "month", "limit_type": "pooled-quota", "note": "per account, not per function" }
+      ],
+      "price": "0 USD up to 90,000 GiB-seconds per month",
+      "overage_price": "0.0000185 USD per GiB-second (an extra million costs 18.50 USD)",
+      "notes": "It does not charge invocations separately: everything is billed as GiB-seconds, using the formula invocations × RAM in GiB × execution seconds. WATCH OUT FOR ROUNDING: the minimum billable duration is 100 ms per invocation, so a function that responds in 5 ms is charged as if it took 100, twenty times more. To get a sense of the quota: 90,000 GiB-s gives 720,000 invocations of a 128 MiB function that runs for one second, or 180,000 if the function uses 512 MiB. It is the smallest free tier of the four serverless services in this database: AWS Lambda and Scaleway give 400,000 GB-s, equivalent to 372,529 GiB-s, that is, 4.1 times more. The quota does not carry over from one month to the next.",
+      "binary_units": true,
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.digitalocean.com/pricing/functions"]
+    },
+    {
+      "id": "digitalocean-app-platform-basic",
+      "provider": "DigitalOcean",
+      "service": "App Platform — basic web service",
+      "type": "application-platform",
+      "free": false,
+      "pricing_model": "time-subscription",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "gb-egress", "amount": 50, "period": "month", "note": "GiB included" }
+      ],
+      "price": "5 USD/month (1 shared CPU, 512 MiB of RAM)",
+      "notes": "Development database sold separately: 7 USD/month for 512 MB.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://docs.digitalocean.com/products/app-platform/details/pricing/"]
+    },
+    {
+      "id": "render-web-free",
+      "provider": "Render",
+      "service": "Free web service",
+      "type": "application-platform",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": false,
+      "expires": null,
+      "includes": [],
+      "price": "0 USD",
+      "notes": "It suspends after 15 minutes without traffic and takes about a minute to come back. Render shows a loading page while it wakes up.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://render.com/docs/free"]
+    },
+    {
+      "id": "render-postgres-free",
+      "provider": "Render",
+      "service": "Free PostgreSQL",
+      "type": "relational-database",
+      "free": true,
+      "pricing_model": "time-limited-free",
+      "card_required": false,
+      "expires": "30 days from creation",
+      "includes": [
+        { "unit": "gb-month", "amount": 1, "period": "month" }
+      ],
+      "price": "0 USD for 30 days",
+      "notes": "IMPORTANT TRAP: the database EXPIRES 30 days after it is created, with a 14-day grace period to pay before deletion. Useless for data that must persist.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://render.com/docs/free"]
+    },
+    {
+      "id": "koyeb-free",
+      "provider": "Koyeb",
+      "service": "Free instance",
+      "type": "application-platform",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "gb-month", "amount": 2, "period": "month", "note": "SSD" }
+      ],
+      "price": "0 USD",
+      "notes": "One web service with 512 MB of RAM and 0.1 vCPU, in Frankfurt or Washington DC. It DOES require a card: they hold 29 USD to verify it. Its free PostgreSQL only covers 5 active hours per month, so it is no good as a persistent database.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.koyeb.com/docs/faqs/pricing"]
+    },
+    {
+      "id": "scaleway-serverless-containers-free",
+      "provider": "Scaleway",
+      "service": "Serverless Containers (free tier)",
+      "type": "managed-containers",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "vcpu-second", "amount": 200000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "gb-second", "amount": 400000, "period": "month", "limit_type": "pooled-quota" }
+      ],
+      "price": "0 USD within the quota",
+      "notes": "Its serverless functions add 1 million requests and 400,000 GB-seconds per month.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.scaleway.com/en/pricing/serverless/"]
+    },
+    {
+      "id": "ibm-code-engine-free",
+      "provider": "IBM Cloud",
+      "service": "Code Engine (free tier)",
+      "type": "managed-containers",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": true,
+      "expires": null,
+      "includes": [
+        { "unit": "vcpu-second", "amount": 100000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "gb-second", "amount": 200000, "period": "month", "limit_type": "pooled-quota" }
+      ],
+      "price": "0 USD within the quota",
+      "notes": "It renews every month and does not expire. No associated free database.",
+      "confidence": "secondary",
+      "verified": "2026-09-07",
+      "sources": ["https://cloud.ibm.com/docs/codeengine?topic=codeengine-pricing"]
+    },
+    {
+      "id": "replit-starter",
+      "provider": "Replit",
+      "service": "Starter plan",
+      "type": "application-platform",
+      "free": true,
+      "pricing_model": "perpetual-free",
+      "card_required": false,
+      "expires": null,
+      "includes": [],
+      "price": "0 USD",
+      "notes": "Allows 1 published project, an included database and one background task, with “free daily usage” whose figures they do not publish. Secondary sources indicate suspension after 5 minutes, 512 MB of RAM and no custom domain. The Core plan costs 17 USD/month on annual billing or 20 USD on monthly billing.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://replit.com/pricing"]
+    },
+    {
+      "id": "fly-io-shared-cpu",
+      "provider": "Fly.io",
+      "service": "Shared CPU Machines",
+      "type": "managed-containers",
+      "free": false,
+      "pricing_model": "metered-usage",
+      "card_required": true,
+      "expires": null,
+      "includes": [],
+      "price": "from 1.94 to 85.59 USD/month; from 0.0027 to 0.1189 USD/hour (Amsterdam prices)",
+      "notes": "The ONLY one of the six lines whose price VARIES BY REGION: the figures here are for Amsterdam and do not apply to other zones. It is also the only one that bills PER SECOND, so its monthly price is a 30-day equivalent, not a cap: the implied hours are around 720 versus 613-714 for the others, meaning there is no discount for leaving the machine running. The price breaks down cleanly into two additive parts: a CPU base that doubles at each tier (0.69 / 1.39 / 2.78 / 5.54 USD per month) plus 5.00 USD per GB of RAM, uniform across the four sizes. No preset includes disk: volumes are charged separately. It removed its free tier for new accounts in October 2024. It has real regions in Latin America (Bogotá, São Paulo, Santiago, Querétaro), but its payments through Stripe reject a high fraction of Venezuelan cards.",
+      "binary_units": false,
+      "pricing_region": "ams (Amsterdam)",
+      "plans": [
+        {
+          "plan": "shared-cpu-1x",
+          "vcpu": 1,
+          "ram_gb": 0.25,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0027,
+          "per_second_price_usd": 7.5e-7,
+          "monthly_price_usd": 1.94
+        },
+        {
+          "plan": "shared-cpu-1x",
+          "vcpu": 1,
+          "ram_gb": 0.5,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0044,
+          "per_second_price_usd": 0.00000123,
+          "monthly_price_usd": 3.19
+        },
+        {
+          "plan": "shared-cpu-1x",
+          "vcpu": 1,
+          "ram_gb": 1,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0079,
+          "per_second_price_usd": 0.0000022,
+          "monthly_price_usd": 5.7
+        },
+        {
+          "plan": "shared-cpu-1x",
+          "vcpu": 1,
+          "ram_gb": 2,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0149,
+          "per_second_price_usd": 0.00000413,
+          "monthly_price_usd": 10.7
+        },
+        {
+          "plan": "shared-cpu-2x",
+          "vcpu": 2,
+          "ram_gb": 0.5,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0054,
+          "per_second_price_usd": 0.0000015,
+          "monthly_price_usd": 3.89
+        },
+        {
+          "plan": "shared-cpu-2x",
+          "vcpu": 2,
+          "ram_gb": 1,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0089,
+          "per_second_price_usd": 0.00000246,
+          "monthly_price_usd": 6.39
+        },
+        {
+          "plan": "shared-cpu-2x",
+          "vcpu": 2,
+          "ram_gb": 2,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0158,
+          "per_second_price_usd": 0.0000044,
+          "monthly_price_usd": 11.39
+        },
+        {
+          "plan": "shared-cpu-2x",
+          "vcpu": 2,
+          "ram_gb": 4,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0297,
+          "per_second_price_usd": 0.00000826,
+          "monthly_price_usd": 21.4
+        },
+        {
+          "plan": "shared-cpu-4x",
+          "vcpu": 4,
+          "ram_gb": 1,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0108,
+          "per_second_price_usd": 0.000003,
+          "monthly_price_usd": 7.78
+        },
+        {
+          "plan": "shared-cpu-4x",
+          "vcpu": 4,
+          "ram_gb": 2,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0177,
+          "per_second_price_usd": 0.00000493,
+          "monthly_price_usd": 12.78
+        },
+        {
+          "plan": "shared-cpu-4x",
+          "vcpu": 4,
+          "ram_gb": 4,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0316,
+          "per_second_price_usd": 0.00000879,
+          "monthly_price_usd": 22.78
+        },
+        {
+          "plan": "shared-cpu-4x",
+          "vcpu": 4,
+          "ram_gb": 8,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0594,
+          "per_second_price_usd": 0.00001651,
+          "monthly_price_usd": 42.79
+        },
+        {
+          "plan": "shared-cpu-8x",
+          "vcpu": 8,
+          "ram_gb": 2,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0216,
+          "per_second_price_usd": 0.000006,
+          "monthly_price_usd": 15.55
+        },
+        {
+          "plan": "shared-cpu-8x",
+          "vcpu": 8,
+          "ram_gb": 4,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0355,
+          "per_second_price_usd": 0.00000986,
+          "monthly_price_usd": 25.56
+        },
+        {
+          "plan": "shared-cpu-8x",
+          "vcpu": 8,
+          "ram_gb": 8,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.0633,
+          "per_second_price_usd": 0.00001758,
+          "monthly_price_usd": 45.57
+        },
+        {
+          "plan": "shared-cpu-8x",
+          "vcpu": 8,
+          "ram_gb": 16,
+          "storage_gb": null,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.1189,
+          "per_second_price_usd": 0.00003302,
+          "monthly_price_usd": 85.59
+        }
+      ],
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://fly.io/docs/about/pricing/#compute"]
+    },
+    {
+      "id": "railway-trial",
+      "provider": "Railway",
+      "service": "Free trial",
+      "type": "application-platform",
+      "free": true,
+      "pricing_model": "one-time-credit",
+      "card_required": false,
+      "expires": "30 days",
+      "includes": [],
+      "price": "5 USD credit for 30 days; afterwards a 1 USD/month minimum; Hobby plan 5 USD/month",
+      "notes": "It withdrew its real free tier in July 2023.",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://docs.railway.com/pricing/free-trial"]
+    },
+    {
+      "id": "turso-free",
+      "provider": "Turso",
+      "service": "Free tier",
+      "type": "edge-database",
+      "free": true,
+      "pricing_model": "monthly-renewable-quota",
+      "card_required": false,
+      "expires": null,
+      "includes": [
+        { "unit": "gb-month", "amount": 5, "period": "month" },
+        { "unit": "row-read", "amount": 500000000, "period": "month", "limit_type": "pooled-quota" },
+        { "unit": "row-written", "amount": 10000000, "period": "month", "limit_type": "pooled-quota" }
+      ],
+      "price": "0 USD",
+      "notes": "Managed SQLite, the closest replacement to D1 if you have to leave Cloudflare. SOURCES DISAGREE on the exact figures (between 5 and 9 GB): confirm on their page before deciding.",
+      "confidence": "secondary",
+      "verified": "2026-09-07",
+      "sources": ["https://turso.tech/pricing"]
+    },
+    {
+      "id": "hetzner-cost-optimized",
+      "provider": "Hetzner",
+      "service": "Cost-Optimized (CX line)",
+      "type": "virtual-machine",
+      "free": false,
+      "pricing_model": "base-plus-overage",
+      "card_required": false,
+      "expires": null,
+      "includes": [],
+      "price": "from 6.49 to 18.49 USD/month; from 0.010 to 0.030 USD/hour",
+      "notes": "Shared Intel/AMD vCPU. It has the lowest price per RAM of the five lines compared: from 1.62 USD per GB of RAM per month on the entry tier (CX23) to 1.16 on the largest (CX43). The other four lines do not go below 5.00. The table does not publish included transfer. It accepts PayPal and SEPA.",
+      "binary_units": false,
+      "plans": [
+        {
+          "plan": "CX23",
+          "vcpu": 2,
+          "processor": "Intel/AMD",
+          "ram_gb": 4,
+          "storage_gb": 40,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.01,
+          "monthly_price_usd": 6.49
+        },
+        {
+          "plan": "CX33",
+          "vcpu": 4,
+          "processor": "Intel/AMD",
+          "ram_gb": 8,
+          "storage_gb": 80,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.016,
+          "monthly_price_usd": 9.99
+        },
+        {
+          "plan": "CX43",
+          "vcpu": 8,
+          "processor": "Intel/AMD",
+          "ram_gb": 16,
+          "storage_gb": 160,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.03,
+          "monthly_price_usd": 18.49
+        }
+      ],
+      "screenshot": "sources/hetzner-cost-optimized.png",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.hetzner.com/cloud"]
+    },
+    {
+      "id": "hetzner-regular-performance",
+      "provider": "Hetzner",
+      "service": "Regular Performance (CPX line)",
+      "type": "virtual-machine",
+      "free": false,
+      "pricing_model": "base-plus-overage",
+      "card_required": false,
+      "expires": null,
+      "includes": [],
+      "price": "from 13.49 to 81.99 USD/month; from 0.022 to 0.131 USD/hour",
+      "notes": "Shared AMD vCPU, with more disk per plan than the CX line but at a price per GB of RAM four times higher: from 6.75 USD on the entry tier (CPX12) to 5.12 on the largest (CPX42), versus the CX range of 1.62 to 1.16. The CPX12 is a new plan. The table does not publish included transfer.",
+      "binary_units": false,
+      "plans": [
+        {
+          "plan": "CPX12",
+          "vcpu": 1,
+          "processor": "AMD",
+          "ram_gb": 2,
+          "storage_gb": 40,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.022,
+          "monthly_price_usd": 13.49
+        },
+        {
+          "plan": "CPX22",
+          "vcpu": 2,
+          "processor": "AMD",
+          "ram_gb": 4,
+          "storage_gb": 80,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.037,
+          "monthly_price_usd": 22.99
+        },
+        {
+          "plan": "CPX32",
+          "vcpu": 4,
+          "processor": "AMD",
+          "ram_gb": 8,
+          "storage_gb": 160,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.067,
+          "monthly_price_usd": 41.99
+        },
+        {
+          "plan": "CPX42",
+          "vcpu": 8,
+          "processor": "AMD",
+          "ram_gb": 16,
+          "storage_gb": 320,
+          "transfer_tb": null,
+          "hourly_price_usd": 0.131,
+          "monthly_price_usd": 81.99
+        }
+      ],
+      "screenshot": "sources/hetzner-regular-performance.png",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.hetzner.com/cloud"]
+    },
+    {
+      "id": "digitalocean-basic-droplets",
+      "provider": "DigitalOcean",
+      "service": "Basic Droplets",
+      "type": "virtual-machine",
+      "free": false,
+      "pricing_model": "base-plus-overage",
+      "card_required": true,
+      "expires": null,
+      "includes": [],
+      "price": "from 4.00 to 96.00 USD/month; from 0.00595 to 0.14286 USD/hour",
+      "notes": "The ONLY one of the five lines compared that uses BINARY UNITS (MiB/GiB): its 16 GiB is 7.4% more than the 16 GB of the others, so comparing them without converting carries that error along. Its table also does not publish a plan name: plans are identified only by their resources. It is also the most consistent on hourly rate, with the month equivalent to exactly 672 hours on every tier.",
+      "binary_units": true,
+      "plans": [
+        {
+          "plan": null,
+          "vcpu": 1,
+          "ram_gb": 0.5,
+          "storage_gb": 10,
+          "transfer_tb": 0.5,
+          "hourly_price_usd": 0.00595,
+          "monthly_price_usd": 4
+        },
+        { "plan": null, "vcpu": 1, "ram_gb": 1, "storage_gb": 25, "transfer_tb": 1, "hourly_price_usd": 0.00893, "monthly_price_usd": 6 },
+        { "plan": null, "vcpu": 1, "ram_gb": 2, "storage_gb": 50, "transfer_tb": 2, "hourly_price_usd": 0.01786, "monthly_price_usd": 12 },
+        { "plan": null, "vcpu": 2, "ram_gb": 2, "storage_gb": 60, "transfer_tb": 3, "hourly_price_usd": 0.02679, "monthly_price_usd": 18 },
+        { "plan": null, "vcpu": 2, "ram_gb": 4, "storage_gb": 80, "transfer_tb": 4, "hourly_price_usd": 0.03571, "monthly_price_usd": 24 },
+        { "plan": null, "vcpu": 4, "ram_gb": 8, "storage_gb": 160, "transfer_tb": 5, "hourly_price_usd": 0.07143, "monthly_price_usd": 48 },
+        { "plan": null, "vcpu": 8, "ram_gb": 16, "storage_gb": 320, "transfer_tb": 6, "hourly_price_usd": 0.14286, "monthly_price_usd": 96 }
+      ],
+      "screenshot": "sources/digitalocean-basic-droplets.png",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.digitalocean.com/pricing/droplets"]
+    },
+    {
+      "id": "vultr-vps",
+      "provider": "Vultr",
+      "service": "Cloud Compute (vc2 line)",
+      "type": "virtual-machine",
+      "free": false,
+      "pricing_model": "base-plus-overage",
+      "card_required": false,
+      "expires": null,
+      "includes": [],
+      "price": "from 2.50 to 80.00 USD/month; from 0.004 to 0.119 USD/hour",
+      "notes": "The cheapest entry tier of the five lines compared (2.50 USD/month). It accepts direct payment in cryptocurrency, which avoids the problem of rejected cards. Regions in Miami, Mexico City, São Paulo and Santiago.",
+      "binary_units": false,
+      "plans": [
+        {
+          "plan": "vc2-1c-0.5gb-v6",
+          "vcpu": 1,
+          "ram_gb": 0.5,
+          "storage_gb": 10,
+          "transfer_tb": 0.5,
+          "hourly_price_usd": 0.004,
+          "monthly_price_usd": 2.5
+        },
+        {
+          "plan": "vc2-1c-1gb",
+          "vcpu": 1,
+          "ram_gb": 1,
+          "storage_gb": 25,
+          "transfer_tb": 1,
+          "hourly_price_usd": 0.007,
+          "monthly_price_usd": 5
+        },
+        {
+          "plan": "vc2-1c-2gb",
+          "vcpu": 1,
+          "ram_gb": 2,
+          "storage_gb": 55,
+          "transfer_tb": 2,
+          "hourly_price_usd": 0.015,
+          "monthly_price_usd": 10
+        },
+        {
+          "plan": "vc2-2c-2gb",
+          "vcpu": 2,
+          "ram_gb": 2,
+          "storage_gb": 65,
+          "transfer_tb": 3,
+          "hourly_price_usd": 0.022,
+          "monthly_price_usd": 15
+        },
+        {
+          "plan": "vc2-2c-4gb",
+          "vcpu": 2,
+          "ram_gb": 4,
+          "storage_gb": 80,
+          "transfer_tb": 3,
+          "hourly_price_usd": 0.03,
+          "monthly_price_usd": 20
+        },
+        {
+          "plan": "vc2-4c-8gb",
+          "vcpu": 4,
+          "ram_gb": 8,
+          "storage_gb": 160,
+          "transfer_tb": 4,
+          "hourly_price_usd": 0.06,
+          "monthly_price_usd": 40
+        },
+        {
+          "plan": "vc2-6c-16gb",
+          "vcpu": 6,
+          "ram_gb": 16,
+          "storage_gb": 320,
+          "transfer_tb": 5,
+          "hourly_price_usd": 0.119,
+          "monthly_price_usd": 80
+        }
+      ],
+      "screenshot": "sources/vultr-cloud-compute.png",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.vultr.com/pricing/"]
+    },
+    {
+      "id": "linode-shared-cpu",
+      "provider": "Linode (Akamai)",
+      "service": "Shared CPU (Nanode and Linode)",
+      "type": "virtual-machine",
+      "free": false,
+      "pricing_model": "base-plus-overage",
+      "card_required": true,
+      "expires": null,
+      "includes": [],
+      "price": "from 5.00 to 384.00 USD/month; from 0.0075 to 0.5760 USD/hour",
+      "notes": "The only one of the five lines that publishes network bandwidth per plan (40 Gbps inbound; 1 to 9 Gbps outbound). The Nanode works out to 5.00 USD per GB of RAM per month and all the other tiers to 6.00: do not read the entry price as representative of the line. It is also the one that scales highest, up to 64 GB of RAM.",
+      "binary_units": false,
+      "plans": [
+        {
+          "plan": "Nanode 1 GB",
+          "vcpu": 1,
+          "ram_gb": 1,
+          "storage_gb": 25,
+          "transfer_tb": 1,
+          "network_gbps": "40/1",
+          "hourly_price_usd": 0.0075,
+          "monthly_price_usd": 5
+        },
+        {
+          "plan": "Linode 2 GB",
+          "vcpu": 1,
+          "ram_gb": 2,
+          "storage_gb": 50,
+          "transfer_tb": 2,
+          "network_gbps": "40/2",
+          "hourly_price_usd": 0.018,
+          "monthly_price_usd": 12
+        },
+        {
+          "plan": "Linode 4 GB",
+          "vcpu": 2,
+          "ram_gb": 4,
+          "storage_gb": 80,
+          "transfer_tb": 4,
+          "network_gbps": "40/4",
+          "hourly_price_usd": 0.036,
+          "monthly_price_usd": 24
+        },
+        {
+          "plan": "Linode 8 GB",
+          "vcpu": 4,
+          "ram_gb": 8,
+          "storage_gb": 160,
+          "transfer_tb": 5,
+          "network_gbps": "40/5",
+          "hourly_price_usd": 0.072,
+          "monthly_price_usd": 48
+        },
+        {
+          "plan": "Linode 16 GB",
+          "vcpu": 6,
+          "ram_gb": 16,
+          "storage_gb": 320,
+          "transfer_tb": 8,
+          "network_gbps": "40/6",
+          "hourly_price_usd": 0.144,
+          "monthly_price_usd": 96
+        },
+        {
+          "plan": "Linode 32 GB",
+          "vcpu": 8,
+          "ram_gb": 32,
+          "storage_gb": 640,
+          "transfer_tb": 16,
+          "network_gbps": "40/7",
+          "hourly_price_usd": 0.288,
+          "monthly_price_usd": 192
+        },
+        {
+          "plan": "Linode 64 GB",
+          "vcpu": 16,
+          "ram_gb": 64,
+          "storage_gb": 1280,
+          "transfer_tb": 20,
+          "network_gbps": "40/9",
+          "hourly_price_usd": 0.576,
+          "monthly_price_usd": 384
+        }
+      ],
+      "screenshot": "sources/linode-shared-cpu.png",
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.linode.com/pricing/"]
+    },
+    {
+      "id": "ovhcloud-vps",
+      "provider": "OVHcloud",
+      "service": "VPS",
+      "type": "virtual-machine",
+      "free": false,
+      "pricing_model": "time-subscription",
+      "card_required": false,
+      "expires": null,
+      "includes": [],
+      "price": "from 4.54 to 23.37 USD/month. It does NOT publish an hourly rate: the line is contracted by the month.",
+      "notes": "THE BEST PRICE PER GB OF RAM OF ALL THE LINES COMPARED: from 1.13 USD per month on the VPS-1 to 0.97 on the VPS-4, even below the 1.16 of the best tier of Hetzner's CX line. All four of its plans beat Hetzner's best. It is also the only one that advertises UNLIMITED TRAFFIC —the real limit becomes the bandwidth of the link, from 500 Mbps to 3 Gbps— and the only one that includes a daily backup of the last 24 hours. Two caveats that offset the above: prices are advertised as “starting at”, meaning they are introductory prices and renewal tends to be more expensive, and OVHcloud announced staggered increases of 9-11% between 2026 and 2028 because of the cost of memory. Since there is no hourly rate, there is also no way to pay only for the time you use it.",
+      "binary_units": false,
+      "screenshot": "sources/ovhcloud-vps.png",
+      "plans": [
+        {
+          "plan": "VPS-1",
+          "vcpu": 2,
+          "ram_gb": 4,
+          "storage_gb": 40,
+          "transfer_tb": null,
+          "transfer_unlimited": true,
+          "network_gbps": "0.5",
+          "monthly_price_usd": 4.54
+        },
+        {
+          "plan": "VPS-2",
+          "vcpu": 4,
+          "ram_gb": 8,
+          "storage_gb": 75,
+          "transfer_tb": null,
+          "transfer_unlimited": true,
+          "network_gbps": "1",
+          "monthly_price_usd": 8.5
+        },
+        {
+          "plan": "VPS-3",
+          "vcpu": 6,
+          "ram_gb": 12,
+          "storage_gb": 100,
+          "transfer_tb": null,
+          "transfer_unlimited": true,
+          "network_gbps": "2",
+          "monthly_price_usd": 12.32
+        },
+        {
+          "plan": "VPS-4",
+          "vcpu": 8,
+          "ram_gb": 24,
+          "storage_gb": 200,
+          "transfer_tb": null,
+          "transfer_unlimited": true,
+          "network_gbps": "3",
+          "monthly_price_usd": 23.37
+        }
+      ],
+      "confidence": "official",
+      "verified": "2026-09-07",
+      "sources": ["https://www.ovhcloud.com/en/vps/"]
+    }
+  ]
+}
