@@ -115,3 +115,7 @@ El inglés es el idioma canónico de los datos, el código y la documentación. 
 Las 34 ofertas son las verificadas durante la investigación que originó este repositorio (septiembre de 2026), no un censo del mercado. Dos están marcadas como `confidence: "secondary"` porque no se pudieron confirmar en documentación oficial: el validador las lista cada vez que se ejecuta.
 
 Los precios cambian sin aviso. Este repositorio no evita ese problema: lo hace **visible**.
+
+## Licencia
+
+Los datos, las traducciones y la documentación (`data/`, `locales/`, `schema/`, las guías y los README) están bajo [CC BY 4.0](LICENSES/CC-BY-4.0.txt): puedes reutilizarlos libremente, también con fines comerciales, citando al autor. El código (`scripts/`) está bajo la [licencia MIT](LICENSES/MIT.txt). Las capturas de tablas de precios de `sources/` pertenecen a sus proveedores y no están cubiertas por ninguna de las dos licencias. [`LICENSE`](LICENSE) detalla el alcance exacto y una línea de atribución sugerida; los textos legales están solo en inglés.

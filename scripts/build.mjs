@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Builds guide.html from the data files and the locales.
 // The page contains every language at once (one container per language) and a switch between them.
 // No dependencies: node scripts/build.mjs

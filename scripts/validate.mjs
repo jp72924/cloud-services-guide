@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Validates the data against the schema rules, checks that every translation is complete,
 // and warns about anything that has gone stale.
 // No dependencies: node scripts/validate.mjs

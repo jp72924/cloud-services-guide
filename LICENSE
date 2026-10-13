@@ -1,0 +1,52 @@
+Cloud services knowledge base
+Copyright (c) 2026 Jesus Perez
+
+This repository holds two kinds of work, so it carries two licenses. Which one
+applies depends on the kind of file.
+
+1. DATA, DOCUMENTATION AND TRANSLATIONS: CC BY 4.0
+   SPDX-License-Identifier: CC-BY-4.0
+   Full text: LICENSES/CC-BY-4.0.txt
+              https://creativecommons.org/licenses/by/4.0/
+
+   Applies to:
+     data/        the canonical offers, types and units
+     locales/     the translations and the interface strings
+     schema/      the documented contract of the data
+     README.md, README.es.md, GUIDE.md, GUIDE.es.md, CLAUDE.md
+
+   You may copy, redistribute, adapt and use this material for any purpose,
+   including commercially, as long as you give appropriate credit, link to the
+   license and indicate whether you made changes. A suggested credit line:
+
+     "Cloud services knowledge base" by Jesus Perez,
+     https://github.com/jp72924/cloud-services-guide, licensed under CC BY 4.0.
+
+2. CODE: MIT
+   SPDX-License-Identifier: MIT
+   Full text: LICENSES/MIT.txt
+
+   Applies to:
+     scripts/     build.mjs and validate.mjs
+
+NOT COVERED BY EITHER LICENSE
+
+   sources/     Screenshots of the price tables published by DigitalOcean,
+                Hetzner, Linode, OVHcloud and Vultr, kept as evidence of the
+                figures cited in data/offers.json. They belong to their
+                owners. They are included here only so that the figures can be
+                checked; this repository grants no right to reuse them.
+
+   Provider, product and service names are trademarks of their owners and are
+   used only to identify the offers. Prices and terms are reported as they
+   were on the date in each offer's "verified" field and change without
+   notice; see the disclaimers in the license texts.
+
+GENERATED FILES
+
+   guide.html (built by `node scripts/build.mjs`, not stored in the
+   repository) combines the data (CC BY 4.0) with the page template that comes
+   from scripts/build.mjs (MIT). If you redistribute it, keep both notices.
+
+The license texts are in English only. The Spanish documents translate the
+documentation, not the licenses.

@@ -115,3 +115,7 @@ English is the canonical language of the data, the code and the documentation. S
 The 34 offers are the ones verified during the research that gave rise to this repository (September 2026), not a census of the market. Two are marked `confidence: "secondary"` because they could not be confirmed in official documentation: the validator lists them every time it runs.
 
 Prices change without notice. This repository does not prevent that problem: it makes it **visible**.
+
+## License
+
+The data, translations and documentation (`data/`, `locales/`, `schema/`, the guides and the READMEs) are under [CC BY 4.0](LICENSES/CC-BY-4.0.txt): reuse them freely, including commercially, but credit the author. The code (`scripts/`) is under the [MIT License](LICENSES/MIT.txt). The price-table screenshots in `sources/` belong to their providers and are not covered by either license. [`LICENSE`](LICENSE) gives the exact scope and a suggested credit line.
